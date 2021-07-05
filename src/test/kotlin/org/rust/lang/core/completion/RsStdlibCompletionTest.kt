@@ -12,6 +12,30 @@ import org.rust.lang.core.macros.MacroExpansionScope
 
 @ProjectDescriptor(WithStdlibRustProjectDescriptor::class)
 class RsStdlibCompletionTest : RsCompletionTestBase() {
+    fun `test complete simple closure`() = doFirstCompletion("""
+        fn f(_f: fn()) {}
+        fn main() { f(/*caret*/); }
+    """, """
+        fn f(_f: fn()) {}
+        fn main() { f(||/*caret*/); }
+    """)
+
+    fun `test complete simple closure next`() = doFirstCompletion("""
+        fn f(_f: fn(n: u8)) {}
+        fn main() { f(/*caret*/); }
+    """, """
+        fn f(_f: fn(n: u8)) {}
+        fn main() { f(|_|/*caret*/); }
+    """)
+
+    fun `test complete simple closure next2`() = doFirstCompletion("""
+        fn f(_f: fn(n1: u8, n2: i32, n3: String)) {}
+        fn main() { f(/*caret*/); }
+    """, """
+        fn f(_f: fn(n1: u8, n2: i32, n3: String)) {}
+        fn main() { f(|_, _, _|/*caret*/); }
+    """)
+
     fun `test prelude`() = doFirstCompletion("""
         fn main() {
             dr/*caret*/

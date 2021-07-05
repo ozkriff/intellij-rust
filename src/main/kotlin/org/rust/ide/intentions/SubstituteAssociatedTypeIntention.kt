@@ -38,6 +38,7 @@ class SubstituteAssociatedTypeIntention : RsElementBaseIntentionAction<Substitut
     }
 
     override fun invoke(project: Project, editor: Editor, ctx: Context) {
+        // ctx.typeAliasReference
         val factory = RsPsiFactory(project)
         val typeRef = ctx.typeAliasReference
         val isTypeContext = ctx.path.parentOfType<RsTypeReference>() != null

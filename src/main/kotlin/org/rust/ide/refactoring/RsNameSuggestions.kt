@@ -14,12 +14,7 @@ import org.rust.ide.refactoring.introduceVariable.IntroduceVariableTestmarks
 import org.rust.ide.utils.CallInfo
 import org.rust.lang.core.psi.*
 import org.rust.lang.core.psi.ext.ancestorOrSelf
-import org.rust.lang.core.psi.ext.ancestorStrict
-import org.rust.lang.core.types.ty.TyAdt
-import org.rust.lang.core.types.ty.TyInteger
-import org.rust.lang.core.types.ty.TyTraitObject
-import org.rust.lang.core.types.ty.TyTypeParameter
-import org.rust.lang.core.types.type
+import org.rust.lang.core.types.ty.*
 import org.rust.stdext.mapNotNullToSet
 
 
@@ -84,6 +79,15 @@ fun RsExpr.suggestedNames(): SuggestedNames {
     names.removeAll(usedNames)
 
     return SuggestedNames(name, names)
+}
+
+private fun suggestedNames(type1: Ty, names: LinkedHashSet<String>) {
+    when (val type = type1) {
+        is TyInteger -> names.addName("i")
+        is TyTypeParameter -> names.addName(type.name)
+        is TyAdt -> names.addName(type.item.name)
+        is TyTraitObject -> type.traits.forEach { names.addName(it.element.name) }
+    }
 }
 
 private val uselessNames = listOf("new", "default")
