@@ -339,7 +339,7 @@ private class ExitPointVisitor(
     private val RsExpr.isInTailPosition: Boolean
         get() {
             // Ignore the expression if any of its ancestors are cfg-disabled
-            if (ancestors.any { !existsAfterExpansion }) return false
+            if (!existsAfterExpansion) return false
 
             for (ancestor in ancestors) {
                 when (ancestor) {
