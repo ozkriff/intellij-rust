@@ -240,7 +240,7 @@ sealed class ExitPoint {
 private class ExitPointVisitor(
     private val sink: (ExitPoint) -> Unit
 ) : RsVisitor() {
-    var inTry = 0
+    var inTry = 0 // TODO: I need to get how it works, right?
     var inEndLoop = 0
     var outerLoopLabel: String? = null
 
@@ -259,10 +259,12 @@ private class ExitPointVisitor(
         }
     }
 
+    // why we jst call sink here but...
     override fun visitRetExpr(retExpr: RsRetExpr) = sink(ExitPoint.Return(retExpr))
 
+    // ...but call cildren stuff here?? i guess that inTry has something to do with it?
     override fun visitTryExpr(tryExpr: RsTryExpr) {
-        tryExpr.expr.acceptChildren(this)
+        tryExpr.expr.acceptChildren(this) // NOTE: commenting this out kianda helps, buuuut it's not a godd thing to do
         if (inTry == 0) sink(ExitPoint.TryExpr(tryExpr))
     }
 
@@ -343,8 +345,20 @@ private class ExitPointVisitor(
 
             for (ancestor in ancestors) {
                 when (ancestor) {
+                    // TODO: try checking right siblings that existsAfterExpansion
+
                     // RsExprStmt may actually be RsExpr because of its rightSiblings' cfg attributes
                     is RsExprStmt -> return ancestor.semicolon == null
+                    // is RsExprStmt -> return ancestor.semicolon == null && ancestor.parent is RsBlock
+
+//                    is RsExprStmt -> {
+//                        // if (ancestor.semicolon == null && !ancestor.rightSiblings.any { existsAfterExpansion && it is RsExpr })
+//                        // if (ancestor.semicolon == null && !ancestor.rightSiblings.any { existsAfterExpansion })
+//                        // if (ancestor.semicolon == null)
+//                            return true
+//                    }
+
+
                     is RsFunction, is RsLambdaExpr -> return true
                     is RsStmt, is RsCondition, is RsMatchArmGuard, is RsPat, is RsMacroArgument -> return false
                     else -> {

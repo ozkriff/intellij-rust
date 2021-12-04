@@ -146,6 +146,7 @@ class RsHighlightExitPointsHandlerFactoryTest : RsTestBase() {
         }
     """, "return", "s.diverge()")
 
+    // TODO: fix!
     fun `test highlight ? operator as return`() = doTest("""
         fn main() {
             if true {
@@ -155,6 +156,7 @@ class RsHighlightExitPointsHandlerFactoryTest : RsTestBase() {
         }
     """, "?", "return 0")
 
+    // TODO: fix!
     fun `test highlight ? operator as return with caret at ?`() = doTest("""
         fn main() {
             if true {
@@ -382,6 +384,7 @@ class RsHighlightExitPointsHandlerFactoryTest : RsTestBase() {
     """, "?", "return 0")
 
 
+    // вроде как вот этот тест должен бы падать, но?
     fun `test ? in macro`() = doTest("""
         fn main(){
             macrocall![ ?/*caret*/ ];
