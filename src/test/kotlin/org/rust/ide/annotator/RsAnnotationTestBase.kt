@@ -90,6 +90,38 @@ abstract class RsAnnotationTestBase : RsTestBase() {
         testmark: Testmark? = null
     ) = annotationFixture.checkFixByFileTreeWithoutHighlighting(fixName, before, after, stubOnly, testmark)
 
+    // TODO: extend this?
+    protected fun checkFixByTextWithLiveTemplate(
+        fixName: String,
+        @Language("Rust") before: String,
+        toType: String,
+        @Language("Rust") after: String,
+        fileName: String = "main.rs",
+        checkWarn: Boolean = true,
+        checkInfo: Boolean = false,
+        checkWeakWarn: Boolean = false,
+        testmark: Testmark? = null
+    ) {
+        checkByTextWithLiveTemplate(before, after, toType, fileName) {
+            annotationFixture.checkFixByTextOzkriffExperiment(fixName, before, after, checkWarn, checkInfo, checkWeakWarn, testmark)
+            // codeInsightFixture.configureByText(baseFileName, replaceCaretMarker(text.trimIndent()))
+            // TODO: check more stuff here?
+            // annotationFixture.checkFixByText(fixName, before, after, checkWarn, checkInfo, checkWeakWarn, testmark)
+        }
+
+//        TemplateManagerImpl.setTemplateTesting(testRootDisposable)
+//        InlineFile(before.trimIndent(), fileName).withCaret()
+//
+//        annotationFixture.checkFixByText(fixName, before, after, checkWarn, checkInfo, checkWeakWarn, testmark)
+//
+//        assertNotNull(TemplateManagerImpl.getTemplateState(myFixture.editor))
+//        myFixture.type(toType)
+//        assertNull(TemplateManagerImpl.getTemplateState(myFixture.editor))
+//        myFixture.checkResult(replaceCaretMarker(after.trimIndent()))
+
+
+    }
+
     protected fun checkFixIsUnavailable(
         fixName: String,
         @Language("Rust") text: String,

@@ -154,4 +154,19 @@ class RsUnusedMustUseInspectionTest : RsInspectionsTestBase(RsUnusedMustUseInspe
             foo().expect("TODO: panic message");
         }
     """)
+
+    @ProjectDescriptor(WithStdlibRustProjectDescriptor::class)
+    fun `test fixing unused result by adding expect with template`() = checkFixByTextWithLiveTemplate("Add `.expect(\"\")`","""
+        fn foo() -> Result<bool, ()> { false }
+
+        fn main() {
+            <weak_warning descr="Unused Result<bool, ()> that must be used">/*caret*/foo()</weak_warning>;
+        }
+    """, "abc", """"
+        fn foo() -> Result<bool, ()> { false }
+
+        fn main() {
+            foo().expect("abc");
+        }
+    """)
 }

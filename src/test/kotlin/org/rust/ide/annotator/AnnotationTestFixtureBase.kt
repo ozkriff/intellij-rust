@@ -94,6 +94,27 @@ abstract class AnnotationTestFixtureBase(
         configure = this::configureByText,
         testmark = testmark)
 
+    fun checkFixByTextOzkriffExperiment(
+        fixName: String,
+        before: String,
+        after: String,
+        checkWarn: Boolean = true,
+        checkInfo: Boolean = false,
+        checkWeakWarn: Boolean = false,
+        testmark: Testmark? = null
+    ) {
+        configureByText(before)
+        applyQuickFix(fixName)
+//        checkFix(
+//            fixName, before, after,
+//            configure = this::configureByText,
+//            // checkBefore = { codeInsightFixture.checkHighlighting(checkWarn, checkInfo, checkWeakWarn) },
+//            checkBefore = { },
+//            checkAfter = { },
+//            testmark = testmark
+//        )
+    }
+
     fun checkFixByText(
         fixName: String,
         before: String,
