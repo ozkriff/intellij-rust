@@ -57,6 +57,7 @@ abstract class CargoTestRunConfigurationProducerBase : CargoRunConfigurationProd
         return true
     }
 
+    // TODO: investigate how this is used
     protected fun registerConfigProvider(provider: TestConfigProvider) {
         testConfigProviders.add(provider)
     }

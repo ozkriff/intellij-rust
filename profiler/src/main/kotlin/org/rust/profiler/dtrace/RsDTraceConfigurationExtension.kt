@@ -22,23 +22,23 @@ import com.intellij.profiler.*
 import com.intellij.profiler.clion.DTraceProfilerConfigurable
 import com.intellij.profiler.clion.NativeTargetProcess
 import com.intellij.profiler.clion.dtrace.DTraceProfilerSettings
+import org.rust.cargo.runconfig.CargoAwareConfiguration
 import org.rust.cargo.runconfig.CargoCommandConfigurationExtension
 import org.rust.cargo.runconfig.ConfigurationExtensionContext
-import org.rust.cargo.runconfig.command.CargoCommandConfiguration
 import org.rust.profiler.RsProfilerRunner
 import org.rust.profiler.legacy.RsProfilerRunnerLegacy
 import java.io.File
 
 class RsDTraceConfigurationExtension : CargoCommandConfigurationExtension() {
-    override fun isApplicableFor(configuration: CargoCommandConfiguration): Boolean = true
+    override fun isApplicableFor(configuration: CargoAwareConfiguration): Boolean = true
 
     override fun isEnabledFor(
-        applicableConfiguration: CargoCommandConfiguration,
+        applicableConfiguration: CargoAwareConfiguration,
         runnerSettings: RunnerSettings?
     ): Boolean = isEnabledFor()
 
     override fun patchCommandLine(
-        configuration: CargoCommandConfiguration,
+        configuration: CargoAwareConfiguration,
         environment: ExecutionEnvironment,
         cmdLine: GeneralCommandLine,
         context: ConfigurationExtensionContext
@@ -51,7 +51,7 @@ class RsDTraceConfigurationExtension : CargoCommandConfigurationExtension() {
     }
 
     override fun attachToProcess(
-        configuration: CargoCommandConfiguration,
+        configuration: CargoAwareConfiguration,
         handler: ProcessHandler,
         environment: ExecutionEnvironment,
         context: ConfigurationExtensionContext

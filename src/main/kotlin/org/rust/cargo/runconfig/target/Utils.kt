@@ -22,6 +22,8 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Key
 import com.intellij.util.execution.ParametersListUtil
 import com.intellij.util.text.nullize
+import org.rust.cargo.runconfig.CargoAwareConfiguration
+import org.rust.cargo.runconfig.hasRemoteTarget
 import org.rust.cargo.runconfig.RsProcessHandler
 import org.rust.cargo.runconfig.command.CargoCommandConfiguration
 import org.rust.cargo.runconfig.command.hasRemoteTarget
@@ -37,14 +39,15 @@ enum class BuildTarget {
     val isRemote: Boolean get() = this == REMOTE
 }
 
-val CargoCommandConfiguration.targetEnvironment: TargetEnvironmentConfiguration?
+// TODO: just replace with CargoAwareConfiguration?
+val CargoAwareConfiguration.targetEnvironment: TargetEnvironmentConfiguration?
     get() {
         if (!RunTargetsEnabled.get()) return null
         val targetName = defaultTargetName ?: return null
         return TargetEnvironmentsManager.getInstance(project).targets.findByName(targetName)
     }
 
-val CargoCommandConfiguration.localBuildArgsForRemoteRun: List<String>
+val CargoAwareConfiguration.localBuildArgsForRemoteRun: List<String>
     get() = if (hasRemoteTarget && buildTarget.isLocal) {
         ParametersListUtil.parse(targetEnvironment?.languageRuntime?.localBuildArgs.orEmpty())
     } else {

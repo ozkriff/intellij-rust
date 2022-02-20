@@ -26,6 +26,7 @@ import com.intellij.openapi.vfs.VfsUtil
 import com.intellij.openapi.vfs.VirtualFile
 import org.rust.cargo.CargoConstants.ProjectLayout
 import org.rust.cargo.project.settings.toolchain
+import org.rust.cargo.runconfig.CargoAwareConfiguration
 import org.rust.cargo.runconfig.CargoRunStateBase
 import org.rust.cargo.runconfig.RsDefaultProgramRunnerBase
 import org.rust.cargo.runconfig.buildtool.CargoBuildManager.getBuildConfiguration
@@ -45,7 +46,7 @@ class GrcovRunner : RsDefaultProgramRunnerBase() {
 
     override fun canRun(executorId: String, profile: RunProfile): Boolean {
         if (executorId != CoverageExecutor.EXECUTOR_ID || profile !is CargoCommandConfiguration ||
-            profile.clean() !is CargoCommandConfiguration.CleanConfiguration.Ok) return false
+            profile.clean() !is CargoAwareConfiguration.CleanConfiguration.Ok) return false
         return !profile.hasRemoteTarget && !isBuildConfiguration(profile) && getBuildConfiguration(profile) != null
     }
 

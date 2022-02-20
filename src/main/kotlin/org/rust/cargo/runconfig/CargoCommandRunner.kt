@@ -15,6 +15,7 @@ import org.rust.cargo.runconfig.buildtool.CargoBuildManager.isBuildConfiguration
 import org.rust.cargo.runconfig.buildtool.CargoBuildManager.isBuildToolWindowAvailable
 import org.rust.cargo.runconfig.command.CargoCommandConfiguration
 import org.rust.cargo.runconfig.command.hasRemoteTarget
+// import org.rust.cargo.runconfig.hasRemoteTarget // ?
 
 open class CargoCommandRunner : RsDefaultProgramRunnerBase() {
     override fun getRunnerId(): String = RUNNER_ID
@@ -22,6 +23,7 @@ open class CargoCommandRunner : RsDefaultProgramRunnerBase() {
     override fun canRun(executorId: String, profile: RunProfile): Boolean {
         if (executorId != DefaultRunExecutor.EXECUTOR_ID || profile !is CargoCommandConfiguration) return false
         val cleaned = profile.clean().ok ?: return false
+        // note: do the same in my runner
         val isLocalRun = !profile.hasRemoteTarget || profile.buildTarget.isRemote
         val isLegacyTestRun = !profile.isBuildToolWindowAvailable &&
             cleaned.cmd.command == "test" &&

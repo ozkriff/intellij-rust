@@ -426,6 +426,16 @@ object CargoMetadata {
         val buildScriptMessage = buildMessages.find { it is BuildScriptMessage } as? BuildScriptMessage
         val procMacroArtifact = getProcMacroArtifact(buildMessages)
 
+
+//        val buildScriptArtifact = buildMessages
+//            .filterIsInstance<CompilerArtifactMessage>()
+//            .filter {
+//                // it.target.kind.contains("proc-macro") && it.target.crate_types.contains("proc-macro")
+//                it.target.kind.contains("custom-build") && it.target.crate_types.contains("custom-build")
+//                // it.target.crate_types.contains()
+//            }
+
+
         val cfgOptions = buildScriptMessage?.cfgs?.let { CfgOptions.parse(it) }
 
         val envFromBuildscript = buildScriptMessage?.env.orEmpty()
@@ -485,6 +495,7 @@ object CargoMetadata {
             .flatMap { it.filenames }
             .find { file -> DYNAMIC_LIBRARY_EXTENSIONS.any { file.endsWith(it) } }
 
+        // NOTE: file hash usage - maybe that's what i need for build script artifact?
         return procMacroArtifactPath?.let {
             val originPath = Path.of(procMacroArtifactPath)
 

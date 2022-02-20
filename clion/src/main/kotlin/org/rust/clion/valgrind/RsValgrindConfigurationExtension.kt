@@ -34,9 +34,9 @@ import com.jetbrains.cidr.cpp.profiling.ui.MemoryProfileOutputPanel
 import com.jetbrains.cidr.cpp.valgrind.*
 import com.jetbrains.cidr.cpp.valgrind.actions.EditValgrindSettingsAction
 import com.jetbrains.cidr.lang.toolchains.CidrToolEnvironment
+import org.rust.cargo.runconfig.CargoAwareConfiguration
 import org.rust.cargo.runconfig.CargoCommandConfigurationExtension
 import org.rust.cargo.runconfig.ConfigurationExtensionContext
-import org.rust.cargo.runconfig.command.CargoCommandConfiguration
 import org.rust.cargo.toolchain.wsl.RsWslToolchain
 import org.rust.clion.valgrind.legacy.RsValgrindRunnerLegacy
 import org.rust.openapiext.isInternal
@@ -48,15 +48,15 @@ import java.io.IOException
 private val LOG: Logger = logger<RsValgrindConfigurationExtension>()
 
 class RsValgrindConfigurationExtension : CargoCommandConfigurationExtension() {
-    override fun isApplicableFor(configuration: CargoCommandConfiguration): Boolean = true
+    override fun isApplicableFor(configuration: CargoAwareConfiguration): Boolean = true
 
     override fun isEnabledFor(
-        applicableConfiguration: CargoCommandConfiguration,
+        applicableConfiguration: CargoAwareConfiguration,
         runnerSettings: RunnerSettings?
     ): Boolean = isEnabledFor(applicableConfiguration)
 
     override fun patchCommandLine(
-        configuration: CargoCommandConfiguration,
+        configuration: CargoAwareConfiguration,
         environment: ExecutionEnvironment,
         cmdLine: GeneralCommandLine,
         context: ConfigurationExtensionContext
@@ -94,7 +94,7 @@ class RsValgrindConfigurationExtension : CargoCommandConfigurationExtension() {
     }
 
     override fun patchCommandLineState(
-        configuration: CargoCommandConfiguration,
+        configuration: CargoAwareConfiguration,
         environment: ExecutionEnvironment,
         state: CommandLineState,
         context: ConfigurationExtensionContext
@@ -123,7 +123,7 @@ class RsValgrindConfigurationExtension : CargoCommandConfigurationExtension() {
     }
 
     override fun attachToProcess(
-        configuration: CargoCommandConfiguration,
+        configuration: CargoAwareConfiguration,
         handler: ProcessHandler,
         environment: ExecutionEnvironment,
         context: ConfigurationExtensionContext
@@ -200,7 +200,7 @@ class RsValgrindConfigurationExtension : CargoCommandConfigurationExtension() {
     private fun <T> putUserData(
         key: Key<T>,
         value: T,
-        configuration: CargoCommandConfiguration,
+        configuration: CargoAwareConfiguration, // TODO: is this a good idea at all??
         context: ConfigurationExtensionContext
     ) {
         if (configuration.getUserData(STORE_DATA_IN_RUN_CONFIGURATION) == true) {
@@ -212,7 +212,7 @@ class RsValgrindConfigurationExtension : CargoCommandConfigurationExtension() {
 
     private fun <T> getUserData(
         key: Key<T>,
-        configuration: CargoCommandConfiguration,
+        configuration: CargoAwareConfiguration, // TODO: is this a good idea??
         context: ConfigurationExtensionContext
     ): T? = if (configuration.getUserData(STORE_DATA_IN_RUN_CONFIGURATION) == true) {
         configuration.getUserData(key)
@@ -231,7 +231,7 @@ class RsValgrindConfigurationExtension : CargoCommandConfigurationExtension() {
 
         private val TAG_RE: Regex = "<(exe|obj|dir)>(.+)</\\1>".toRegex();
 
-        fun isEnabledFor(configuration: CargoCommandConfiguration): Boolean {
+        fun isEnabledFor(configuration: CargoAwareConfiguration): Boolean {
             val toolchain = configuration.clean().ok?.toolchain
             return SystemInfo.isLinux || SystemInfo.isMac || SystemInfo.isWindows && toolchain is RsWslToolchain
         }

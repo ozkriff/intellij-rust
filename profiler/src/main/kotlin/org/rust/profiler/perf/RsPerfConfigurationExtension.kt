@@ -22,9 +22,9 @@ import com.intellij.util.text.nullize
 import com.jetbrains.cidr.cpp.toolchains.CPPEnvironment
 import com.jetbrains.cidr.cpp.toolchains.CPPToolchains
 import com.jetbrains.cidr.lang.toolchains.CidrToolEnvironment
+import org.rust.cargo.runconfig.CargoAwareConfiguration
 import org.rust.cargo.runconfig.CargoCommandConfigurationExtension
 import org.rust.cargo.runconfig.ConfigurationExtensionContext
-import org.rust.cargo.runconfig.command.CargoCommandConfiguration
 import org.rust.cargo.toolchain.wsl.RsWslToolchain
 import org.rust.profiler.RsProfilerRunner
 import org.rust.profiler.legacy.RsProfilerRunnerLegacy
@@ -32,15 +32,15 @@ import java.nio.file.Path
 
 class RsPerfConfigurationExtension : CargoCommandConfigurationExtension() {
 
-    override fun isApplicableFor(configuration: CargoCommandConfiguration): Boolean = true
+    override fun isApplicableFor(configuration: CargoAwareConfiguration): Boolean = true
 
     override fun isEnabledFor(
-        applicableConfiguration: CargoCommandConfiguration,
+        applicableConfiguration: CargoAwareConfiguration,
         runnerSettings: RunnerSettings?
     ): Boolean = isEnabledFor(applicableConfiguration)
 
     override fun patchCommandLine(
-        configuration: CargoCommandConfiguration,
+        configuration: CargoAwareConfiguration,
         environment: ExecutionEnvironment,
         cmdLine: GeneralCommandLine,
         context: ConfigurationExtensionContext
@@ -69,7 +69,7 @@ class RsPerfConfigurationExtension : CargoCommandConfigurationExtension() {
     }
 
     override fun attachToProcess(
-        configuration: CargoCommandConfiguration,
+        configuration: CargoAwareConfiguration,
         handler: ProcessHandler,
         environment: ExecutionEnvironment,
         context: ConfigurationExtensionContext
@@ -127,7 +127,7 @@ class RsPerfConfigurationExtension : CargoCommandConfigurationExtension() {
             exePath = perfPath
         }
 
-        fun isEnabledFor(configuration: CargoCommandConfiguration): Boolean {
+        fun isEnabledFor(configuration: CargoAwareConfiguration): Boolean {
             val toolchain = configuration.clean().ok?.toolchain
             return SystemInfo.isLinux || SystemInfo.isWindows && toolchain is RsWslToolchain
         }

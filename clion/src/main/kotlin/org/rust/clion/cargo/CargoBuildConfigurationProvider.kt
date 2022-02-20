@@ -20,6 +20,12 @@ class CargoBuildConfigurationProvider : CidrBuildConfigurationProvider {
             ?: return emptyList()
         val buildConfiguration = getBuildConfiguration(configuration) ?: return emptyList()
         val environment = createBuildEnvironment(buildConfiguration) ?: return emptyList()
+
+        if (buildConfiguration !is CargoCommandConfiguration) { // TODO: will it work at all?
+            assert(false)
+            return emptyList()
+        }
+
         return listOf(CLionCargoBuildConfiguration(buildConfiguration, environment))
     }
 }

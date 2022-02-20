@@ -56,7 +56,7 @@ abstract class RsAsyncRunner(
 ) : AsyncProgramRunner<RunnerSettings>() {
     override fun canRun(executorId: String, profile: RunProfile): Boolean {
         if (executorId != this.executorId || profile !is CargoCommandConfiguration ||
-            profile.clean() !is CargoCommandConfiguration.CleanConfiguration.Ok) return false
+            profile.clean() !is CargoAwareConfiguration.CleanConfiguration.Ok) return false
         return !profile.hasRemoteTarget &&
             !profile.isBuildToolWindowAvailable &&
             !isBuildConfiguration(profile) &&

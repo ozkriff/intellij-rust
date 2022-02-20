@@ -49,7 +49,7 @@ private val LOG: Logger = logger<CargoBuildTaskRunner>()
 
 class CargoBuildTaskRunner : ProjectTaskRunner() {
 
-    override fun run(
+    override fun run( // note
         project: Project,
         context: ProjectTaskContext,
         vararg tasks: ProjectTask
@@ -91,13 +91,13 @@ class CargoBuildTaskRunner : ProjectTaskRunner() {
         return resultPromise
     }
 
-    override fun canRun(projectTask: ProjectTask): Boolean =
+    override fun canRun(projectTask: ProjectTask): Boolean = // why false
         when (projectTask) {
             is ModuleBuildTask ->
                 projectTask.module.cargoProjectRoot != null
             is ProjectModelBuildTask<*> -> {
                 val buildableElement = projectTask.buildableElement
-                buildableElement is CargoBuildConfiguration && buildableElement.enabled
+                buildableElement is CargoBuildConfiguration && buildableElement.enabled // не работает, потому что мы пихаем билд вместо нашей конфигурации
             }
             else -> false
         }
@@ -108,7 +108,9 @@ class CargoBuildTaskRunner : ProjectTaskRunner() {
         val project = task.module.project
         val runManager = RunManager.getInstance(project)
 
-        val selectedConfiguration = runManager.selectedConfiguration?.configuration as? CargoCommandConfiguration
+        // TODO все-таки добавить сюда обработку своей конфигурации
+
+        val selectedConfiguration = runManager.selectedConfiguration?.configuration as? CargoCommandConfiguration // NOTE
         if (selectedConfiguration != null) {
             val buildConfiguration = getBuildConfiguration(selectedConfiguration) ?: return emptyList()
             val environment = createBuildEnvironment(buildConfiguration) ?: return emptyList()

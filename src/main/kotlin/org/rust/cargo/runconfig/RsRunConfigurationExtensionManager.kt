@@ -13,9 +13,9 @@ import com.intellij.execution.runners.ExecutionEnvironment
 import com.intellij.openapi.components.service
 import org.rust.cargo.runconfig.command.CargoCommandConfiguration
 
-class RsRunConfigurationExtensionManager : RunConfigurationExtensionsManager<CargoCommandConfiguration, CargoCommandConfigurationExtension>(CargoCommandConfigurationExtension.EP_NAME) {
+class RsRunConfigurationExtensionManager : RunConfigurationExtensionsManager<CargoAwareConfiguration, CargoCommandConfigurationExtension>(CargoCommandConfigurationExtension.EP_NAME) {
     fun attachExtensionsToProcess(
-        configuration: CargoCommandConfiguration,
+        configuration: CargoAwareConfiguration,
         handler: ProcessHandler,
         environment: ExecutionEnvironment,
         context: ConfigurationExtensionContext
@@ -26,7 +26,7 @@ class RsRunConfigurationExtensionManager : RunConfigurationExtensionsManager<Car
     }
 
     fun patchCommandLine(
-        configuration: CargoCommandConfiguration,
+        configuration: CargoAwareConfiguration,
         environment: ExecutionEnvironment,
         cmdLine: GeneralCommandLine,
         context: ConfigurationExtensionContext
@@ -37,7 +37,7 @@ class RsRunConfigurationExtensionManager : RunConfigurationExtensionsManager<Car
     }
 
     fun patchCommandLineState(
-        configuration: CargoCommandConfiguration,
+        configuration: CargoAwareConfiguration,
         environment: ExecutionEnvironment,
         state: CommandLineState,
         context: ConfigurationExtensionContext

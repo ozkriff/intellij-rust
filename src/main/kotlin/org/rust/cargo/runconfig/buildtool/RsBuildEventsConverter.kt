@@ -105,10 +105,14 @@ class RsBuildEventsConverter(private val context: CargoBuildContextBase) : Build
             }
             CargoMetadata.TargetKind.TEST -> true
             CargoMetadata.TargetKind.LIB -> rustcArtifact.profile.test
+
+            CargoMetadata.TargetKind.CUSTOM_BUILD -> true // TODO: this is mostly for a test for now
+
             else -> false
         }
         if (!isSuitableTarget || context.isTestBuild && !rustcArtifact.profile.test) return true
 
+        // NOTE: вот тут чертовы артефакты кладутся в контекст, который потом...
         context.artifacts += rustcArtifact
 
         return true

@@ -28,7 +28,7 @@ import java.time.LocalDate
 class CargoTestRunState(
     environment: ExecutionEnvironment,
     runConfiguration: CargoCommandConfiguration,
-    config: CargoCommandConfiguration.CleanConfiguration.Ok
+    config: CargoAwareConfiguration.CleanConfiguration.Ok
 ) : CargoRunStateBase(environment, runConfiguration, config) {
     private val cargoTestPatch: CargoPatch = { commandLine ->
         val rustcVer = cargoProject?.rustcInfo?.version

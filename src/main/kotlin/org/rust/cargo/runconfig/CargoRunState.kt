@@ -11,8 +11,8 @@ import org.rust.cargo.runconfig.console.CargoConsoleBuilder
 
 class CargoRunState(
     environment: ExecutionEnvironment,
-    runConfiguration: CargoCommandConfiguration,
-    config: CargoCommandConfiguration.CleanConfiguration.Ok
+    runConfiguration: CargoAwareConfiguration,
+    config: CargoAwareConfiguration.CleanConfiguration.Ok
 ) : CargoRunStateBase(environment, runConfiguration, config) {
     init {
         consoleBuilder = CargoConsoleBuilder(project, runConfiguration)

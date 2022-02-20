@@ -29,10 +29,12 @@ import org.rust.cargo.toolchain.tools.cargoOrWrapper
 import org.rust.cargo.toolchain.tools.rustc
 import java.nio.file.Path
 
+// TODO: I need to create smthg like this for buildscripts
+
 abstract class CargoRunStateBase(
     environment: ExecutionEnvironment,
-    val runConfiguration: CargoCommandConfiguration,
-    val config: CargoCommandConfiguration.CleanConfiguration.Ok
+    val runConfiguration: CargoAwareConfiguration,
+    val config: CargoAwareConfiguration.CleanConfiguration.Ok
 ) : CommandLineState(environment) {
     val project: Project = environment.project
     val toolchain: RsToolchainBase = config.toolchain

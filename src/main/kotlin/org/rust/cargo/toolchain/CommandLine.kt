@@ -137,6 +137,7 @@ data class CargoCommandLine(
                             listOf("--lib")
                         }
                     }
+                    // NOTE: хоть это и таргет, но у карго нет внешнего способа запустить это дело, да ведь?
                     CargoWorkspace.TargetKind.CustomBuild,
                     CargoWorkspace.TargetKind.Unknown -> emptyList()
                 }
@@ -195,6 +196,7 @@ data class CargoCommandLine(
     }
 }
 
+// NOTE an example of runin a non-cargo(?) thing
 data class WasmPackCommandLine(
     override val command: String,
     override val workingDirectory: Path,

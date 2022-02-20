@@ -15,28 +15,28 @@ import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.extensions.ExtensionPointName
 import com.intellij.openapi.util.UserDataHolderBase
-import org.rust.cargo.runconfig.command.CargoCommandConfiguration
 
 class ConfigurationExtensionContext : UserDataHolderBase()
 
-abstract class CargoCommandConfigurationExtension : RunConfigurationExtensionBase<CargoCommandConfiguration>() {
+// TODO: maybe even rename?.. it's not ;inked to CargoCommand anymore?
+abstract class CargoCommandConfigurationExtension : RunConfigurationExtensionBase<CargoAwareConfiguration>() {
 
     abstract fun attachToProcess(
-        configuration: CargoCommandConfiguration,
+        configuration: CargoAwareConfiguration,
         handler: ProcessHandler,
         environment: ExecutionEnvironment,
         context: ConfigurationExtensionContext
     )
 
     abstract fun patchCommandLine(
-        configuration: CargoCommandConfiguration,
+        configuration: CargoAwareConfiguration,
         environment: ExecutionEnvironment,
         cmdLine: GeneralCommandLine,
         context: ConfigurationExtensionContext
     )
 
     open fun patchCommandLineState(
-        configuration: CargoCommandConfiguration,
+        configuration: CargoAwareConfiguration,
         environment: ExecutionEnvironment,
         state: CommandLineState,
         context: ConfigurationExtensionContext
@@ -44,7 +44,7 @@ abstract class CargoCommandConfigurationExtension : RunConfigurationExtensionBas
     }
 
     override fun patchCommandLine(
-        configuration: CargoCommandConfiguration,
+        configuration: CargoAwareConfiguration,
         runnerSettings: RunnerSettings?,
         cmdLine: GeneralCommandLine,
         runnerId: String

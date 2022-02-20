@@ -32,6 +32,32 @@ class RunConfigurationTest : RunConfigurationTestBase() {
         check("Hello, world!" in result.stdout)
     }
 
+    // TODO: fix & move to some other place!
+    fun `test build script configuration`() {
+        fileTree {
+            toml("Cargo.toml", """
+                [package]
+                name = "hello-build"
+                version = "0.1.0"
+                authors = []
+            """)
+            rust("build.rs", """
+                fn main() {
+                    println!("Hello, world!");
+                }
+            """)
+            dir("src") {
+                rust("lib.rs", """
+                    // TODO: ?
+                """)
+            }
+        }.create()
+        val configuration = createConfiguration()
+        val result = executeAndGetOutput(configuration)
+
+        check("Hello, world!" in result.stdout)
+    }
+
     fun `test single test configuration 1`() {
         val testProject = fileTree {
             toml("Cargo.toml", """

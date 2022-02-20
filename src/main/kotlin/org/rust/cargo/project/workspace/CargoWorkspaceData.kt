@@ -60,6 +60,8 @@ data class CargoWorkspaceData(
         val env: Map<String, String>,
         val outDirUrl: String?,
         val procMacroArtifact: ProcMacroArtifact? = null,
+
+        // TODO: try to add build script artifact here too?
     )
 
     data class Target(

@@ -34,13 +34,11 @@ import com.intellij.util.text.SemVer
 import com.intellij.util.ui.UIUtil
 import org.jetbrains.annotations.TestOnly
 import org.rust.cargo.project.model.cargoProjects
-import org.rust.cargo.runconfig.CargoCommandRunner
-import org.rust.cargo.runconfig.CargoRunState
-import org.rust.cargo.runconfig.RsCommandConfiguration
-import org.rust.cargo.runconfig.addFormatJsonOption
+import org.rust.cargo.runconfig.*
 import org.rust.cargo.runconfig.command.CargoCommandConfiguration
 import org.rust.cargo.runconfig.command.ParsedCommand
 import org.rust.cargo.runconfig.command.hasRemoteTarget
+import org.rust.cargo.runconfig.customBuild.CustomBuildBuildTaskProvider
 import org.rust.cargo.runconfig.target.localBuildArgsForRemoteRun
 import org.rust.cargo.runconfig.wasmpack.WasmPackBuildTaskProvider
 import org.rust.cargo.toolchain.CargoCommandLine
@@ -64,6 +62,7 @@ object CargoBuildManager {
 
     private val MIN_RUSTC_VERSION: SemVer = "1.48.0".parseSemVer()
 
+    // TODO: I used to have additional "task is CustomBuildBuildTaskProvider.BuildTask" here
     val Project.isBuildToolWindowAvailable: Boolean
         get() {
             if (!isFeatureEnabled(RsExperiments.BUILD_TOOL_WINDOW)) return false
@@ -81,10 +80,25 @@ object CargoBuildManager {
         }
 
     fun build(buildConfiguration: CargoBuildConfiguration): Future<CargoBuildResult> {
+        // val configuration = buildConfiguration.configuration
+        // val configuration = buildConfiguration.configuration as CargoCommandConfiguration // TODO: this will explode in my case!
         val configuration = buildConfiguration.configuration
         val environment = buildConfiguration.environment
         val project = environment.project
 
+        val config = when (configuration) {
+            is CargoAwareConfiguration -> configuration.clean().ok ?: return CANCELED_BUILD_RESULT
+            // is CargoCommandConfiguration -> configuration.clean().ok // TODO: just a weird experiment
+            // is CustomBuildCommandConfiguration -> null // NOTE: huh maybe this is why the conf not starting?
+            // is CustomBuildCommandConfiguration -> null
+            // is CustomBuildCommandConfiguration -> configuration.clean().ok ?: return CANCELED_BUILD_RESULT
+            else -> return CANCELED_BUILD_RESULT
+        }
+        // if (configuration is CargoCommandConfiguration) { // TODO: just a tmp hack. needsto be removed later.
+        //     configuration.clean().ok ?: return CANCELED_BUILD_RESULT
+        // }
+
+        // assert(configuration is CargoCommandConfiguration)
         environment.cargoPatches += cargoBuildPatch
         val state = CargoRunState(
             environment,
@@ -122,7 +136,7 @@ object CargoBuildManager {
                 }
             }
 
-            processHandler = state.startProcess(processColors = false)
+            processHandler = state.startProcess(processColors = false) // NOTE: here the actuall call to cargo stuff happens
             processHandler?.addProcessListener(CargoBuildAdapter(this, buildProgressListener))
             processHandler?.startNotify()
         }
@@ -206,7 +220,10 @@ object CargoBuildManager {
         return context.result
     }
 
-    fun isBuildConfiguration(configuration: CargoCommandConfiguration): Boolean {
+    // CargoCommandConfiguration -> RsCommandConfiguration   ??
+    // fun isBuildConfiguration(configuration: CargoCommandConfiguration): Boolean {
+    fun isBuildConfiguration(configuration: CargoAwareConfiguration): Boolean {
+        // CargoCommandConfiguration
         val parsed = ParsedCommand.parse(configuration.command) ?: return false
         return when (val command = parsed.command) {
             "build", "check", "clippy" -> true
@@ -218,7 +235,8 @@ object CargoBuildManager {
         }
     }
 
-    fun getBuildConfiguration(configuration: CargoCommandConfiguration): CargoCommandConfiguration? {
+    // CargoCommandConfiguration -> RsCommandConfiguration   ??
+    fun getBuildConfiguration(configuration: CargoAwareConfiguration): CargoAwareConfiguration? { // TODO обощить
         if (isBuildConfiguration(configuration)) return configuration
 
         val parsed = ParsedCommand.parse(configuration.command) ?: return null
@@ -248,8 +266,10 @@ object CargoBuildManager {
         return buildConfiguration
     }
 
+    // CargoCommandConfiguration -> RsCommandConfiguration   ??
     fun createBuildEnvironment(
-        buildConfiguration: CargoCommandConfiguration,
+        // buildConfiguration: CargoCommandConfiguration,
+        buildConfiguration: CargoAwareConfiguration,
         environment: ExecutionEnvironment? = null
     ): ExecutionEnvironment? {
         require(isBuildConfiguration(buildConfiguration))

@@ -14,6 +14,7 @@ import org.rust.lang.core.psi.RsElementTypes.IDENTIFIER
 import org.rust.lang.core.psi.RsFunction
 import org.rust.lang.core.psi.ext.elementType
 
+// NOTE
 class CargoExecutableRunLineMarkerContributor : RunLineMarkerContributor() {
     override fun getInfo(element: PsiElement): Info? {
         if (element.elementType != IDENTIFIER) return null

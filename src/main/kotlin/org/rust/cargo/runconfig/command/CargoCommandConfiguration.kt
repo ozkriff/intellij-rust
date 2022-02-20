@@ -6,24 +6,16 @@
 package org.rust.cargo.runconfig.command
 
 import com.intellij.execution.Executor
-import com.intellij.execution.InputRedirectAware
-import com.intellij.execution.configuration.EnvironmentVariablesData
 import com.intellij.execution.configurations.*
 import com.intellij.execution.runners.ExecutionEnvironment
-import com.intellij.execution.target.LanguageRuntimeType
-import com.intellij.execution.target.TargetEnvironmentAwareRunProfile
-import com.intellij.execution.target.TargetEnvironmentConfiguration
-import com.intellij.execution.testframework.actions.ConsolePropertiesProvider
 import com.intellij.execution.testframework.sm.runner.SMTRunnerConsoleProperties
 import com.intellij.execution.util.ProgramParametersUtil
 import com.intellij.openapi.options.SettingsEditor
 import com.intellij.openapi.project.Project
-import com.intellij.openapi.util.NlsContexts.DialogMessage
 import com.intellij.openapi.util.SystemInfo
 import com.intellij.openapi.util.io.FileUtil
 import com.intellij.openapi.vfs.LocalFileSystem
 import com.intellij.util.execution.ParametersListUtil
-import org.jdom.Element
 import org.rust.RsBundle
 import org.rust.cargo.project.model.CargoProject
 import org.rust.cargo.project.model.cargoProjects
@@ -31,14 +23,9 @@ import org.rust.cargo.project.settings.toolchain
 import org.rust.cargo.project.workspace.CargoWorkspace
 import org.rust.cargo.project.workspace.PackageOrigin
 import org.rust.cargo.runconfig.*
-import org.rust.cargo.runconfig.target.BuildTarget
-import org.rust.cargo.runconfig.target.RsLanguageRuntimeConfiguration
-import org.rust.cargo.runconfig.target.RsLanguageRuntimeType
 import org.rust.cargo.runconfig.test.CargoTestConsoleProperties
 import org.rust.cargo.runconfig.ui.CargoCommandConfigurationEditor
-import org.rust.cargo.toolchain.BacktraceMode
 import org.rust.cargo.toolchain.CargoCommandLine
-import org.rust.cargo.toolchain.RsToolchainBase
 import org.rust.cargo.toolchain.RustChannel
 import org.rust.cargo.toolchain.tools.Cargo
 import org.rust.cargo.toolchain.tools.isRustupAvailable
@@ -49,8 +36,12 @@ import java.io.File
 import java.nio.file.Path
 import java.nio.file.Paths
 
+// TODO: uh? rmeove this? ooor?
 val CargoCommandConfiguration.hasRemoteTarget: Boolean
-    get() = defaultTargetName != null
+    get() = (this as CargoAwareConfiguration).hasRemoteTarget
+
+//val CargoCommandConfiguration.hasRemoteTarget: Boolean
+//    get() = defaultTargetName != null
 
 /**
  * This class describes a Run Configuration.
@@ -63,22 +54,9 @@ open class CargoCommandConfiguration(
     project: Project,
     name: String,
     factory: ConfigurationFactory
-) : RsCommandConfiguration(project, name, factory),
-    InputRedirectAware.InputRedirectOptions,
-    ConsolePropertiesProvider,
-    TargetEnvironmentAwareRunProfile {
+) : CargoAwareConfiguration(project, name, factory) {
     override var command: String = "run"
-    var channel: RustChannel = RustChannel.DEFAULT
-    var requiredFeatures: Boolean = true
-    var allFeatures: Boolean = false
-    var emulateTerminal: Boolean = emulateTerminalDefault
-    var withSudo: Boolean = false
-    var buildTarget: BuildTarget = BuildTarget.REMOTE
-    var backtrace: BacktraceMode = BacktraceMode.SHORT
-    var env: EnvironmentVariablesData = EnvironmentVariablesData.DEFAULT
 
-    private var isRedirectInput: Boolean = false
-    private var redirectInputPath: String? = null
     private val redirectInputFile: File?
         get() {
             if (!isRedirectInput) return null
@@ -90,66 +68,6 @@ open class CargoCommandConfiguration(
             }
             return file
         }
-
-    override fun isRedirectInput(): Boolean = isRedirectInput
-
-    override fun setRedirectInput(value: Boolean) {
-        isRedirectInput = value
-    }
-
-    override fun getRedirectInputPath(): String? = redirectInputPath
-
-    override fun setRedirectInputPath(value: String?) {
-        redirectInputPath = value
-    }
-
-    override fun canRunOn(target: TargetEnvironmentConfiguration): Boolean {
-        return target.runtimes.findByType(RsLanguageRuntimeConfiguration::class.java) != null
-    }
-
-    override fun getDefaultLanguageRuntimeType(): LanguageRuntimeType<*>? {
-        return LanguageRuntimeType.EXTENSION_NAME.findExtension(RsLanguageRuntimeType::class.java)
-    }
-
-    override fun getDefaultTargetName(): String? {
-        return options.remoteTarget
-    }
-
-    override fun setDefaultTargetName(targetName: String?) {
-        options.remoteTarget = targetName
-    }
-
-    override fun writeExternal(element: Element) {
-        super.writeExternal(element)
-        element.writeEnum("channel", channel)
-        element.writeBool("requiredFeatures", requiredFeatures)
-        element.writeBool("allFeatures", allFeatures)
-        element.writeBool("emulateTerminal", emulateTerminal)
-        element.writeBool("withSudo", withSudo)
-        element.writeEnum("buildTarget", buildTarget)
-        element.writeEnum("backtrace", backtrace)
-        env.writeExternal(element)
-        element.writeBool("isRedirectInput", isRedirectInput)
-        element.writeString("redirectInputPath", redirectInputPath ?: "")
-    }
-
-    /**
-     * If you change serialization, make sure that the old variant is still
-     * readable for several releases.
-     */
-    override fun readExternal(element: Element) {
-        super.readExternal(element)
-        element.readEnum<RustChannel>("channel")?.let { channel = it }
-        element.readBool("requiredFeatures")?.let { requiredFeatures = it }
-        element.readBool("allFeatures")?.let { allFeatures = it }
-        element.readBool("emulateTerminal")?.let { emulateTerminal = it }
-        element.readBool("withSudo")?.let { withSudo = it }
-        element.readEnum<BuildTarget>("buildTarget")?.let { buildTarget = it }
-        element.readEnum<BacktraceMode>("backtrace")?.let { backtrace = it }
-        env = EnvironmentVariablesData.readExternal(element)
-        element.readBool("isRedirectInput")?.let { isRedirectInput = it }
-        element.readString("redirectInputPath")?.let { redirectInputPath = it }
-    }
 
     fun setFromCmd(cmd: CargoCommandLine) {
         channel = cmd.channel
@@ -165,6 +83,7 @@ open class CargoCommandConfiguration(
         redirectInputPath = cmd.redirectInputFrom?.path
     }
 
+    // NOTE: code duplication? extract it somewhere?
     fun canBeFrom(cmd: CargoCommandLine): Boolean =
         command == cmd.toRawCommand()
 
@@ -223,22 +142,8 @@ open class CargoCommandConfiguration(
         }
     }
 
-    sealed class CleanConfiguration {
-        class Ok(
-            val cmd: CargoCommandLine,
-            val toolchain: RsToolchainBase
-        ) : CleanConfiguration()
-
-        class Err(val error: RuntimeConfigurationError) : CleanConfiguration()
-
-        val ok: Ok? get() = this as? Ok
-
-        companion object {
-            fun error(@Suppress("UnstableApiUsage") @DialogMessage message: String) = Err(RuntimeConfigurationError(message))
-        }
-    }
-
-    fun clean(): CleanConfiguration {
+    // TODO: extract this?
+    override fun clean(): CleanConfiguration {
         val workingDirectory = workingDirectory
             ?: return CleanConfiguration.error("No working directory specified")
 
@@ -358,6 +263,7 @@ open class CargoCommandConfiguration(
     }
 }
 
+// TODO: move to [CargoAwareConfiguration]?
 val CargoProject.workingDirectory: Path get() = manifest.parent
 
 data class ParsedCommand(val command: String, val toolchain: String?, val additionalArguments: List<String>) {

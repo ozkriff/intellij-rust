@@ -7,6 +7,7 @@ package org.rust.cargo.runconfig.target
 
 import com.intellij.execution.configurations.RunProfile
 import com.intellij.execution.executors.DefaultRunExecutor
+import org.rust.cargo.runconfig.CargoAwareConfiguration
 import org.rust.cargo.runconfig.buildtool.CargoBuildManager.isBuildToolWindowAvailable
 import org.rust.cargo.runconfig.command.CargoCommandConfiguration
 import org.rust.cargo.runconfig.command.hasRemoteTarget
@@ -23,7 +24,7 @@ class RsLocalBuildForTargetRunnerLegacy : RsAsyncRunner(DefaultRunExecutor.EXECU
     override fun canRun(executorId: String, profile: RunProfile): Boolean {
         if (executorId != DefaultRunExecutor.EXECUTOR_ID ||
             profile !is CargoCommandConfiguration ||
-            profile.clean() !is CargoCommandConfiguration.CleanConfiguration.Ok) return false
+            profile.clean() !is CargoAwareConfiguration.CleanConfiguration.Ok) return false
         return profile.hasRemoteTarget && profile.buildTarget.isLocal && !profile.isBuildToolWindowAvailable
     }
 

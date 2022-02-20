@@ -225,6 +225,8 @@
                                   implementationClass="org.rust.ide.lineMarkers.CargoExecutableRunLineMarkerContributor"/>
         <runLineMarkerContributor language="Rust"
                                   implementationClass="org.rust.ide.lineMarkers.CargoTestRunLineMarkerContributor"/>
+        <runLineMarkerContributor language="Rust"
+                                  implementationClass="org.rust.cargo.runconfig.customBuild.RsBuildScriptRunLineMarkerContributor"/>
 
         <!-- Rename Processor -->
 
@@ -1014,17 +1016,22 @@
         <programRunner implementation="org.rust.cargo.runconfig.CargoTestCommandRunner"/>
         <programRunner implementation="org.rust.ide.debugger.runconfig.RsDebugAdvertisingRunner"/>
         <programRunner implementation="org.rust.cargo.runconfig.wasmpack.WasmPackCommandRunner"/>
+        <programRunner implementation="org.rust.cargo.runconfig.customBuild.CustomBuildRunner"/>
 
         <configurationType implementation="org.rust.cargo.runconfig.command.CargoCommandConfigurationType"/>
         <configurationType implementation="org.rust.cargo.runconfig.wasmpack.WasmPackCommandConfigurationType"/>
+        <configurationType implementation="org.rust.cargo.runconfig.customBuild.CustomBuildConfigurationType"/>
 
         <runConfigurationProducer
                 implementation="org.rust.cargo.runconfig.command.CompositeCargoRunConfigurationProducer"/>
+        <runConfigurationProducer
+            implementation="org.rust.cargo.runconfig.customBuild.CustomBuildRunConfigurationProducer"/>
         <!-- To register a new producer, add it to the `producers` list in the `CompositeCargoRunConfigurationProducer`
              producer instead of registering it here. -->
 
         <stepsBeforeRunProvider implementation="org.rust.cargo.runconfig.buildtool.CargoBuildTaskProvider"/>
         <stepsBeforeRunProvider implementation="org.rust.cargo.runconfig.wasmpack.WasmPackBuildTaskProvider"/>
+        <stepsBeforeRunProvider implementation="org.rust.cargo.runconfig.customBuild.CustomBuildBuildTaskProvider"/>
 
         <projectTaskRunner implementation="org.rust.cargo.runconfig.buildtool.CargoBuildTaskRunner"/>
 
@@ -1321,6 +1328,8 @@
     </projectListeners>
 
     <actions>
+        <!-- TODO add my action? -->
+
         <action id="Rust.NewRustFile"
                 class="org.rust.ide.actions.RsCreateFileAction">
             <add-to-group group-id="NewGroup" anchor="before" relative-to-action="NewFile"/>

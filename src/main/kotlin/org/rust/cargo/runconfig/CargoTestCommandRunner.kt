@@ -58,7 +58,7 @@ class CargoTestCommandRunner : AsyncProgramRunner<RunnerSettings>() {
                 val buildCmd = state.commandLine.copy(emulateTerminal = false, withSudo = false).run {
                     if (cmdHasNoRun) this else prependArgument("--no-run")
                 }
-                val buildConfig = CargoCommandConfiguration.CleanConfiguration.Ok(buildCmd, state.config.toolchain)
+                val buildConfig = CargoAwareConfiguration.CleanConfiguration.Ok(buildCmd, state.config.toolchain)
                 val buildState = CargoRunState(state.environment, state.runConfiguration, buildConfig)
                 buildState.startProcess(processColors = true)
             }

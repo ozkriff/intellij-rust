@@ -17,6 +17,7 @@ import org.rust.cargo.project.model.CargoProject
 import org.rust.cargo.runconfig.RsExecutableRunner.Companion.artifacts
 import org.rust.cargo.runconfig.buildtool.CargoBuildManager.showBuildNotification
 import org.rust.cargo.runconfig.command.workingDirectory
+import org.rust.cargo.runconfig.customBuild.CustomBuildCommandState // TODO: just a tmp hack
 import org.rust.cargo.toolchain.impl.CompilerArtifactMessage
 import java.nio.file.Path
 import java.util.concurrent.CompletableFuture
@@ -91,6 +92,11 @@ class CargoBuildContext(
 
     fun finished(isSuccess: Boolean) {
         val isCanceled = indicator?.isCanceled ?: false
+
+        // TODO: a tmp hack
+        if (isSuccess && !isCanceled) {
+            CustomBuildCommandState.ARTIFACTS_HACK = artifacts
+        }
 
         environment.artifacts = artifacts.takeIf { isSuccess && !isCanceled }
 
