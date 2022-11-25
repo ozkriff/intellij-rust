@@ -6,7 +6,6 @@
 package org.rust.cargo.runconfig.customBuild
 
 import com.intellij.execution.Location
-import com.intellij.execution.RunnerAndConfigurationSettings
 import com.intellij.execution.actions.ConfigurationContext
 import com.intellij.execution.actions.LazyRunConfigurationProducer
 import com.intellij.execution.configurations.ConfigurationFactory
@@ -35,14 +34,8 @@ class CustomBuildRunConfigurationProducer : LazyRunConfigurationProducer<CustomB
     // TODO: findExistingConfiguration ???
 
     override fun isConfigurationFromContext(configuration: CustomBuildCommandConfiguration, context: ConfigurationContext): Boolean {
-        // TODO("Not yet implemented")
         val location = context.location ?: return false
-
-        // TODO: тут тоже стоит посмотреть на получаемую строку запуска??
-        // context.dataContext.
-        // configuration.
         val target = findCustomBuildTarget(location) ?: return false
-
         return configuration.canBeFrom(target.cargoCommandLine)
     }
 

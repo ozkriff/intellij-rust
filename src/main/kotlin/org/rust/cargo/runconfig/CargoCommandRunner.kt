@@ -26,7 +26,7 @@ open class CargoCommandRunner : RsDefaultProgramRunnerBase() {
         // note: do the same in my runner
         val isLocalRun = !profile.hasRemoteTarget || profile.buildTarget.isRemote
         val isLegacyTestRun = !profile.isBuildToolWindowAvailable &&
-            cleaned.cmd.command == "test" &&
+            cleaned.getMeCmd().command == "test" &&
             getBuildConfiguration(profile) != null
         return isLocalRun && !isLegacyTestRun
     }

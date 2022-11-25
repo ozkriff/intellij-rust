@@ -24,9 +24,10 @@ class CargoExecutableRunLineMarkerContributorTest : RsLineMarkerProviderTestBase
         fn main() {} // - Run 'Run test-package'
     """)
 
-    // TODO: !
     fun `test build script`() = doTest("build.rs", """
         fn main() {}// - Run 'Run build_script_build'
+
+        fn foo() {}
     """)
 
     fun `test library`() = doTest("lib.rs", """

@@ -117,7 +117,6 @@ data class RustcText(
     val text: String?
 )
 
-// TODO: add info about bin path here?
 // https://docs.rs/cargo/0.33.0/cargo/core/manifest/struct.Target.html
 data class Target(
     val crate_types: List<String>,

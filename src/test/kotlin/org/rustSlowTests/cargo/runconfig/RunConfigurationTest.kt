@@ -37,7 +37,7 @@ class RunConfigurationTest : RunConfigurationTestBase() {
         fileTree {
             toml("Cargo.toml", """
                 [package]
-                name = "hello-build"
+                name = "hello-build-rs"
                 version = "0.1.0"
                 authors = []
             """)
@@ -52,7 +52,7 @@ class RunConfigurationTest : RunConfigurationTestBase() {
                 """)
             }
         }.create()
-        val configuration = createConfiguration()
+        val configuration = createCustomBuildRunConfigurationFromContext() // TODO: make it work!
         val result = executeAndGetOutput(configuration)
 
         check("Hello, world!" in result.stdout)

@@ -137,7 +137,7 @@ data class CargoCommandLine(
                             listOf("--lib")
                         }
                     }
-                    // NOTE: хоть это и таргет, но у карго нет внешнего способа запустить это дело, да ведь?
+                    // NOTE: хоть это и таргет, но у карго нет внешнего способа запустить это дело, да ведь? да :(
                     CargoWorkspace.TargetKind.CustomBuild,
                     CargoWorkspace.TargetKind.Unknown -> emptyList()
                 }

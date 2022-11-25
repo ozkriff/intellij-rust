@@ -22,6 +22,7 @@ import com.intellij.openapi.actionSystem.ActionPlaces
 import com.intellij.openapi.util.Disposer
 import com.intellij.psi.PsiElement
 import org.rust.cargo.RsWithToolchainTestBase
+import org.rust.cargo.runconfig.CargoAwareConfiguration
 import org.rust.cargo.runconfig.CargoCommandRunner
 import org.rust.cargo.runconfig.buildtool.CargoBuildConfiguration
 import org.rust.cargo.runconfig.buildtool.CargoBuildManager
@@ -29,6 +30,7 @@ import org.rust.cargo.runconfig.buildtool.CargoBuildResult
 import org.rust.cargo.runconfig.command.CargoCommandConfiguration
 import org.rust.cargo.runconfig.command.CargoCommandConfigurationType
 import org.rust.cargo.runconfig.command.CargoExecutableRunConfigurationProducer
+import org.rust.cargo.runconfig.customBuild.CustomBuildRunConfigurationProducer
 import org.rust.cargo.runconfig.test.CargoTestRunConfigurationProducer
 
 abstract class RunConfigurationTestBase : RsWithToolchainTestBase() {
@@ -52,27 +54,38 @@ abstract class RunConfigurationTestBase : RsWithToolchainTestBase() {
 
     protected fun createExecutableRunConfigurationFromContext(
         location: Location<PsiElement>? = null
-    ): CargoCommandConfiguration = createRunConfigurationFromContext(CargoExecutableRunConfigurationProducer(), location)
+    ): CargoAwareConfiguration = createRunConfigurationFromContext(CargoExecutableRunConfigurationProducer(), location)
 
     protected fun createTestRunConfigurationFromContext(
         location: Location<PsiElement>? = null
-    ): CargoCommandConfiguration = createRunConfigurationFromContext(CargoTestRunConfigurationProducer(), location)
+    ): CargoAwareConfiguration = createRunConfigurationFromContext(CargoTestRunConfigurationProducer(), location)
+
+    protected fun createCustomBuildRunConfigurationFromContext(
+        location: Location<PsiElement>? = null
+    ): CargoAwareConfiguration = createRunConfigurationFromContext(CustomBuildRunConfigurationProducer(), location)
 
     private fun createRunConfigurationFromContext(
-        producer: RunConfigurationProducer<CargoCommandConfiguration>,
+        producer: RunConfigurationProducer<out CargoAwareConfiguration>,
         location: Location<PsiElement>? = null
-    ): CargoCommandConfiguration = createRunnerAndConfigurationSettingsFromContext(producer, location)
-        .configuration as? CargoCommandConfiguration
-        ?: error("Can't create run configuration")
+    ): CargoAwareConfiguration {
+        // TODO: make this work!
+        val c = createRunnerAndConfigurationSettingsFromContext(producer, location)
+        val c2 = c.configuration as? CargoAwareConfiguration
+        return c2 ?: error("Can't create run configuration")
+    }
+    // TODO:
+    // ): CargoAwareConfiguration = createRunnerAndConfigurationSettingsFromContext(producer, location)
+    //     .configuration as? CargoAwareConfiguration
+    //     ?: error("Can't create run configuration")
 
     protected fun createRunnerAndConfigurationSettingsFromContext(
-        producer: RunConfigurationProducer<CargoCommandConfiguration>,
+        producer: RunConfigurationProducer<out CargoAwareConfiguration>,
         location: Location<PsiElement>? = null
     ): RunnerAndConfigurationSettings {
         val context = if (location != null) {
             ConfigurationContext.createEmptyContextForLocation(location)
         } else {
-            val dataContext = DataManager.getInstance().getDataContext(myFixture.editor.component)
+            val dataContext = DataManager.getInstance().getDataContext(myFixture.editor.component) // TODO: crashes here?
             ConfigurationContext.getFromContext(dataContext, ActionPlaces.UNKNOWN)
         }
         return producer.createConfigurationFromContext(context)

@@ -13,9 +13,13 @@ import com.intellij.execution.configurations.RunProfileState
 import com.intellij.execution.runners.ExecutionEnvironment
 import com.intellij.openapi.options.SettingsEditor
 import com.intellij.openapi.project.Project
-import com.intellij.util.execution.ParametersListUtil
+import org.rust.cargo.project.settings.toolchain
 import org.rust.cargo.runconfig.CargoAwareConfiguration
+import org.rust.cargo.runconfig.ParsedCommand
 import org.rust.cargo.toolchain.CargoCommandLine
+import org.rust.cargo.toolchain.RustChannel
+import org.rust.cargo.toolchain.tools.isRustupAvailable
+import java.io.File
 
 // TODO: rename: no need for "Command" part anymore?
 // TODO: move it to some other place!
@@ -25,7 +29,7 @@ class CustomBuildCommandConfiguration(
     name: String,
     factory: ConfigurationFactory
 ) : CargoAwareConfiguration(project, name, factory) {
-    override var command: String = "build" // TODO: sholdn't assume build at all.
+    override var command: String = "build" // TODO: shouldn't assume build at all, right? or?
 
     var outDir: String = project.basePath + "/target/pseudoOutDir" // TODO: un-hack
 
@@ -35,7 +39,7 @@ class CustomBuildCommandConfiguration(
         return CustomBuildCommandState(environment, this)
     }
 
-    // TODO: just a test. remove later.
+    // TODO: just a test
     override fun setBeforeRunTasks(value: MutableList<BeforeRunTask<*>>) {
         super.setBeforeRunTasks(value)
     }
@@ -46,58 +50,62 @@ class CustomBuildCommandConfiguration(
 ////        return WasmPackCommandRunState(environment, this, wasmPack, workingDirectory)
 //    }
 
-
     override fun getConfigurationEditor(): SettingsEditor<out RunConfiguration> =
         CustomBuildConfigurationEditor(project)
 
     // TODO: this was copy-pasted here from CargoCommandConfiguration. needs to be de-duplicated later.
     fun canBeFrom(cmd: CargoCommandLine): Boolean =
-        command == ParametersListUtil.join(cmd.command, *cmd.additionalArguments.toTypedArray())
+        // TODO: lets try always returning true for now.
+        //       needs to be fixed later, something should to be checked (package? target?)
+        true
+        // command == ParametersListUtil.join(cmd.command, *cmd.additionalArguments.toTypedArray())
 
     // TODO: implement writeExternal, readExternal later!
     //       https://plugins.jetbrains.com/docs/intellij/run-configuration-management.html#persistence
 
-    // TODO: uh?
-    override fun clean(): CargoAwareConfiguration.CleanConfiguration {
+    // TODO: uh? code duplication? or how should this be done without a fake CargoCommandLine?
+    override fun clean(): CleanConfiguration {
         val workingDirectory = workingDirectory
-            ?: return CargoAwareConfiguration.CleanConfiguration.error("No working directory specified")
+            ?: return CleanConfiguration.error("No working directory specified")
 
-        return CargoAwareConfiguration.CleanConfiguration.error("I have no idea what's going on for now. just testing") // TODO: just a tmp test by ozkriff
+        // val cmd = null // TODO: tmp thing
 
+        // TODO: is it a good idea? seems to kinda work
+        val cmd = run {
+            // val command = "build" // TODO: just an experiment. what if i make a command out of this?
+            val parsed = ParsedCommand.parse(command)
+                ?: return CleanConfiguration.error("No command specified")
 
-        //
-        // val cmd = run {
-        //     val parsed = ParsedCommand.parse(command)
-        //         ?: return CargoCommandConfiguration.CleanConfiguration.error("No command specified")
-        //
-        //     CargoCommandLine(
-        //         parsed.command,
-        //         workingDirectory,
-        //         parsed.additionalArguments,
-        //         redirectInputFile,
-        //         backtrace,
-        //         parsed.toolchain,
-        //         channel,
-        //         env,
-        //         requiredFeatures,
-        //         allFeatures,
-        //         emulateTerminal,
-        //         withSudo
-        //     )
-        // }
-        //
-        // val toolchain = project.toolchain
-        //     ?: return CargoCommandConfiguration.CleanConfiguration.error("No Rust toolchain specified")
-        //
-        // if (!toolchain.looksLikeValidToolchain()) {
-        //     return CargoCommandConfiguration.CleanConfiguration.error("Invalid toolchain: ${toolchain.presentableLocation}")
-        // }
-        //
-        // if (!toolchain.isRustupAvailable && channel != RustChannel.DEFAULT) {
-        //     return CargoCommandConfiguration.CleanConfiguration.error("Channel '$channel' is set explicitly with no rustup available")
-        // }
+            val redirectInputFile: File? = null // TODO: hack
 
-        // return CargoCommandConfiguration.CleanConfiguration.Ok(cmd, toolchain)
+            CargoCommandLine(
+                parsed.command,
+                workingDirectory,
+                parsed.additionalArguments,
+                redirectInputFile,
+                backtrace,
+                parsed.toolchain,
+                channel,
+                env,
+                requiredFeatures,
+                allFeatures,
+                emulateTerminal,
+                withSudo
+            )
+        }
+
+        val toolchain = project.toolchain
+            ?: return CleanConfiguration.error("No Rust toolchain specified")
+
+        if (!toolchain.looksLikeValidToolchain()) {
+            return CleanConfiguration.error("Invalid toolchain: ${toolchain.presentableLocation}")
+        }
+
+        if (!toolchain.isRustupAvailable && channel != RustChannel.DEFAULT) {
+            return CleanConfiguration.error("Channel '$channel' is set explicitly with no rustup available")
+        }
+
+        return CleanConfiguration.Ok(cmd, toolchain)
     }
 
 

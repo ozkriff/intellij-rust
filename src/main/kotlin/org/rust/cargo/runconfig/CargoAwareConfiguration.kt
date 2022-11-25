@@ -15,6 +15,7 @@ import com.intellij.execution.target.TargetEnvironmentConfiguration
 import com.intellij.execution.testframework.actions.ConsolePropertiesProvider
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.NlsContexts
+import com.intellij.util.execution.ParametersListUtil
 import org.jdom.Element
 import org.rust.cargo.runconfig.command.CargoCommandConfiguration
 import org.rust.cargo.runconfig.target.BuildTarget
@@ -127,11 +128,19 @@ abstract class CargoAwareConfiguration(
 
     sealed class CleanConfiguration {
         class Ok(
-            // TODO: this is kinda weird.
+            // TODO: this is kinda weird. !!!
             //       CargoAwareConfiguration shouldn't know anything ab. CargoCommandLine!
-            val cmd: CargoCommandLine,
+            // TODO: as a first step, let's try making it optional maybe?
+            val cmd: CargoCommandLine?,
             val toolchain: RsToolchainBase
-        ) : CleanConfiguration()
+        ) : CleanConfiguration() {
+
+            // TODO: a tmp hack, replace with a proper thing later
+            fun getMeCmd(): CargoCommandLine {
+                assert(cmd != null)
+                return cmd!!
+            }
+        }
 
         class Err(val error: RuntimeConfigurationError) : CleanConfiguration()
 
@@ -143,4 +152,16 @@ abstract class CargoAwareConfiguration(
     }
 
     abstract fun clean(): CleanConfiguration
+}
+
+data class ParsedCommand(val command: String, val toolchain: String?, val additionalArguments: List<String>) {
+    companion object {
+        fun parse(rawCommand: String): ParsedCommand? {
+            val args = ParametersListUtil.parse(rawCommand)
+            val command = args.firstOrNull { !it.startsWith("+") } ?: return null
+            val toolchain = args.firstOrNull()?.takeIf { it.startsWith("+") }?.removePrefix("+")
+            val additionalArguments = args.drop(args.indexOf(command) + 1)
+            return ParsedCommand(command, toolchain, additionalArguments)
+        }
+    }
 }

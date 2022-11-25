@@ -29,7 +29,7 @@ import org.rust.cargo.toolchain.tools.cargoOrWrapper
 import org.rust.cargo.toolchain.tools.rustc
 import java.nio.file.Path
 
-// TODO: I need to create smthg like this for buildscripts
+// TODO: I need to create smthg like this for buildscripts, right? this can't be reused as is?
 
 abstract class CargoRunStateBase(
     environment: ExecutionEnvironment,
@@ -38,7 +38,12 @@ abstract class CargoRunStateBase(
 ) : CommandLineState(environment) {
     val project: Project = environment.project
     val toolchain: RsToolchainBase = config.toolchain
-    val commandLine: CargoCommandLine = config.cmd
+
+    // TODO: CustomBuild don't have any commandLine. Can I do smthg here about it?
+
+    // if there's no actualal command - try to replace it with "build"???? as a hack???
+
+    val commandLine: CargoCommandLine = config.getMeCmd() // NOTE: !
     val cargoProject: CargoProject? = CargoCommandConfiguration.findCargoProject(
         project,
         commandLine.additionalArguments,

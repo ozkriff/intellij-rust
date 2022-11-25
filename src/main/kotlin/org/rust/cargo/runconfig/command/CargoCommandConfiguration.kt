@@ -43,6 +43,7 @@ val CargoCommandConfiguration.hasRemoteTarget: Boolean
 //val CargoCommandConfiguration.hasRemoteTarget: Boolean
 //    get() = defaultTargetName != null
 
+// TODO: update the description late
 /**
  * This class describes a Run Configuration.
  * It is basically a bunch of values which are persisted to .xml files inside .idea,
@@ -103,7 +104,7 @@ open class CargoCommandConfiguration(
 
         // TODO: remove when `com.intellij.execution.process.ElevationService` supports error stream redirection
         // https://github.com/intellij-rust/intellij-rust/issues/7320
-        if (withSudo && showTestToolWindow(config.cmd)) {
+        if (withSudo && showTestToolWindow(config.getMeCmd())) {
             val message = if (SystemInfo.isWindows) {
                 RsBundle.message("notification.run.tests.as.root.windows")
             } else {
@@ -118,7 +119,7 @@ open class CargoCommandConfiguration(
 
     override fun getState(executor: Executor, environment: ExecutionEnvironment): RunProfileState? {
         val config = clean().ok ?: return null
-        return if (showTestToolWindow(config.cmd)) {
+        return if (showTestToolWindow(config.getMeCmd())) {
             CargoTestRunState(environment, this, config)
         } else {
             CargoRunState(environment, this, config)
@@ -135,7 +136,7 @@ open class CargoCommandConfiguration(
 
     override fun createTestConsoleProperties(executor: Executor): SMTRunnerConsoleProperties? {
         val config = clean().ok ?: return null
-        return if (showTestToolWindow(config.cmd)) {
+        return if (showTestToolWindow(config.getMeCmd())) {
             CargoTestConsoleProperties(this, executor)
         } else {
             null
@@ -265,15 +266,3 @@ open class CargoCommandConfiguration(
 
 // TODO: move to [CargoAwareConfiguration]?
 val CargoProject.workingDirectory: Path get() = manifest.parent
-
-data class ParsedCommand(val command: String, val toolchain: String?, val additionalArguments: List<String>) {
-    companion object {
-        fun parse(rawCommand: String): ParsedCommand? {
-            val args = ParametersListUtil.parse(rawCommand)
-            val command = args.firstOrNull { !it.startsWith("+") } ?: return null
-            val toolchain = args.firstOrNull()?.takeIf { it.startsWith("+") }?.removePrefix("+")
-            val additionalArguments = args.drop(args.indexOf(command) + 1)
-            return ParsedCommand(command, toolchain, additionalArguments)
-        }
-    }
-}

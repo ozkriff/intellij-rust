@@ -35,7 +35,7 @@ class CargoTestCommandRunner : AsyncProgramRunner<RunnerSettings>() {
         val cleaned = profile.clean().ok ?: return false
         val isLocalRun = !profile.hasRemoteTarget || profile.buildTarget.isRemote
         val isLegacyTestRun = !profile.isBuildToolWindowAvailable &&
-            cleaned.cmd.command == "test" &&
+            cleaned.getMeCmd().command == "test" &&
             getBuildConfiguration(profile) != null
         return isLocalRun && isLegacyTestRun
     }

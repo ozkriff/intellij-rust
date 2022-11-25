@@ -95,7 +95,7 @@ class CargoBuildContext(
 
         // TODO: a tmp hack
         if (isSuccess && !isCanceled) {
-            CustomBuildCommandState.ARTIFACTS_HACK = artifacts
+            CustomBuildCommandState.ARTIFACTS_MESSAGES_HACK = artifacts
         }
 
         environment.artifacts = artifacts.takeIf { isSuccess && !isCanceled }

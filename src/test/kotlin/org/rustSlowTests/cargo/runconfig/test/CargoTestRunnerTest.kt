@@ -11,6 +11,7 @@ import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFile
 import com.intellij.psi.search.GlobalSearchScope
 import org.rust.TestProject
+import org.rust.cargo.runconfig.command.CargoCommandConfiguration
 import org.rust.openapiext.toPsiDirectory
 
 class CargoTestRunnerTest : CargoTestRunnerTestBase() {
@@ -857,6 +858,9 @@ class CargoTestRunnerTest : CargoTestRunnerTestBase() {
         onlyDoctests: Boolean = false
     ) {
         val configuration = createTestRunConfigurationFromContext(PsiLocation.fromPsiElement(sourceElement))
+
+        if (configuration !is CargoCommandConfiguration) throw RuntimeException("TODO: ozkriff, fix this properly") // TODO: !!!
+
         if (onlyDoctests) {
             val cmd = configuration.clean().ok?.cmd!!
             val cmdWithDoc = cmd.copy(additionalArguments = listOf("--doc") + cmd.additionalArguments)
