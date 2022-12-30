@@ -47,6 +47,7 @@ import org.rust.stdext.unwrapOrThrow
 import java.nio.file.Path
 import java.nio.file.Paths
 
+// TODO: ozkriff: если билд тул виндоу вырублен, то использовать это
 /**
  * This runner is used if [isBuildToolWindowAvailable] is false.
  */

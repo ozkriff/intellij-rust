@@ -36,7 +36,7 @@ import java.io.File
 import java.nio.file.Path
 import java.nio.file.Paths
 
-// TODO: uh? rmeove this? ooor?
+// TODO: uh? remove this? ooor?
 val CargoCommandConfiguration.hasRemoteTarget: Boolean
     get() = (this as CargoAwareConfiguration).hasRemoteTarget
 

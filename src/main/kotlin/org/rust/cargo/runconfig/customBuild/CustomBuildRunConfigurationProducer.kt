@@ -13,7 +13,6 @@ import com.intellij.openapi.util.Ref
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.psi.PsiElement
 import org.rust.cargo.project.workspace.CargoWorkspace
-import org.rust.cargo.toolchain.CargoCommandLine
 import org.rust.lang.core.psi.RsFile
 import org.rust.lang.core.psi.RsFunction
 import org.rust.lang.core.psi.ext.ancestorStrict
@@ -36,7 +35,8 @@ class CustomBuildRunConfigurationProducer : LazyRunConfigurationProducer<CustomB
     override fun isConfigurationFromContext(configuration: CustomBuildCommandConfiguration, context: ConfigurationContext): Boolean {
         val location = context.location ?: return false
         val target = findCustomBuildTarget(location) ?: return false
-        return configuration.canBeFrom(target.cargoCommandLine)
+        // return configuration.canBeFrom(target.cargoCommandLine) // TODO: what should be passed here?
+        return configuration.canBeFrom()
     }
 
     override fun setupConfigurationFromContext(
@@ -65,7 +65,7 @@ class CustomBuildRunConfigurationProducer : LazyRunConfigurationProducer<CustomB
 
         // TODO: это надо переделать
         // TODO: а тут что в итоге генерится? мы же не можем прям каргу тут запустить, да? у нас кастомный бинарь
-        val cargoCommandLine = CargoCommandLine.forTarget(target, "run") // TODO: нафиг cargo!
+        // val cargoCommandLine = CargoCommandLine.forTarget(target, "run") // TODO: нафиг cargo!
     }
 
     companion object {

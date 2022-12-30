@@ -31,6 +31,7 @@ import org.rust.openapiext.computeWithCancelableProgress
 import org.rust.stdext.toPath
 import java.util.concurrent.CompletableFuture
 
+// TODO: note
 abstract class RsExecutableRunner(
     protected val executorId: String,
     private val errorMessageTitle: String
@@ -45,6 +46,7 @@ abstract class RsExecutableRunner(
     }
 
     override fun execute(environment: ExecutionEnvironment) {
+
         val state = environment.state as CargoRunStateBase
         val project = environment.project
         val host = project.computeWithCancelableProgress("Checking if toolchain is supported...") {
@@ -57,7 +59,8 @@ abstract class RsExecutableRunner(
             return
         }
         environment.cargoPatches += getCargoCommonPatch(project)
-        environment.putUserData(ARTIFACTS, CompletableFuture())
+        environment.putUserData(ARTIFACTS, CompletableFuture()) // NOTE: важная строчка, должна выполняться!
+
         super.execute(environment)
     }
 

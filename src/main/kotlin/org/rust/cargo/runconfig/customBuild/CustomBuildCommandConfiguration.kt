@@ -21,6 +21,9 @@ import org.rust.cargo.toolchain.RustChannel
 import org.rust.cargo.toolchain.tools.isRustupAvailable
 import java.io.File
 
+// TODO: проверить в нормальных раннерах, что конфиги точно один объект
+//       при изменениях в UI и самом раннере. а то вдруг там они тоже разные
+
 // TODO: rename: no need for "Command" part anymore?
 // TODO: move it to some other place!
 // TODO: это выглядит подходящим местом что бы разрешить пользователю менять (псевдо~)OUT_DIR
@@ -31,7 +34,8 @@ class CustomBuildCommandConfiguration(
 ) : CargoAwareConfiguration(project, name, factory) {
     override var command: String = "build" // TODO: shouldn't assume build at all, right? or?
 
-    var outDir: String = project.basePath + "/target/pseudoOutDir" // TODO: un-hack
+    // var outDir: String = project.basePath + "/target/pseudoOutDir" // TODO: un-hack
+    var outDir: String? = null // TODO: let's try keeping it empty by default and only assign an actual value when used
 
     override fun getState(executor: Executor, environment: ExecutionEnvironment): RunProfileState? {
 
@@ -54,7 +58,8 @@ class CustomBuildCommandConfiguration(
         CustomBuildConfigurationEditor(project)
 
     // TODO: this was copy-pasted here from CargoCommandConfiguration. needs to be de-duplicated later.
-    fun canBeFrom(cmd: CargoCommandLine): Boolean =
+    // fun canBeFrom(cmd: CargoCommandLine): Boolean =
+    fun canBeFrom(/*TODO: add some arg!*/): Boolean =
         // TODO: lets try always returning true for now.
         //       needs to be fixed later, something should to be checked (package? target?)
         true

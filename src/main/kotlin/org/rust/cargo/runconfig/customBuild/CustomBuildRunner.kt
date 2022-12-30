@@ -7,12 +7,16 @@ package org.rust.cargo.runconfig.customBuild
 
 import com.intellij.execution.configurations.RunProfile
 import com.intellij.execution.configurations.RunProfileState
+import com.intellij.execution.executors.DefaultRunExecutor
 import com.intellij.execution.runners.ExecutionEnvironment
 import com.intellij.execution.ui.RunContentDescriptor
-import org.rust.cargo.runconfig.RsDefaultProgramRunnerBase
-import org.rust.cargo.runconfig.RsExecutableRunner.Companion.artifacts
+import org.rust.cargo.runconfig.RsExecutableRunner
 
-class CustomBuildRunner : RsDefaultProgramRunnerBase() {
+// TODO: отнаследуйся от RsExecRunner !!!!!!!!!!!
+
+private const val ERROR_MESSAGE_TITLE: String = "Unable to run Custom Build Script"
+
+class CustomBuildRunner : RsExecutableRunner(DefaultRunExecutor.EXECUTOR_ID, ERROR_MESSAGE_TITLE) {
     override fun getRunnerId() = RUNNER_ID
 
     override fun canRun(executorId: String, profile: RunProfile): Boolean {

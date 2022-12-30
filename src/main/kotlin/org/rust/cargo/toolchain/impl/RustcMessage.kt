@@ -169,7 +169,7 @@ data class BuildScriptMessage(
     override val package_id: PackageId,
     val cfgs: List<String>,
     val env: List<List<String>>,
-    val out_dir: String?
+    val out_dir: String? // TODO (ozkriff): check it's ok for me? check if it's even constructed properly?
 ) : CompilerMessage() {
 
     override fun convertPaths(converter: PathConverter): BuildScriptMessage = copy(

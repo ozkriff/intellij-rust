@@ -12,6 +12,7 @@ import com.intellij.execution.process.ProcessTerminatedListener
 import com.intellij.execution.runners.ExecutionEnvironment
 import com.intellij.openapi.application.runWriteAction
 import com.intellij.openapi.vfs.VfsUtil
+import org.rust.cargo.runconfig.RsExecutableRunner.Companion.artifacts
 import org.rust.cargo.runconfig.RsProcessHandler
 import org.rust.cargo.toolchain.impl.CargoMetadata
 import org.rust.cargo.toolchain.impl.CompilerArtifactMessage
@@ -29,7 +30,8 @@ class CustomBuildCommandState(
     }
 
     override fun startProcess(): ProcessHandler {
-        val outDir = runConfiguration.outDir
+        // НАДО ПРОВЕРИТЬ КАК ЭТО РАБОТАЕТ ТЕПЕРЬ:
+        val outDir = runConfiguration.outDir ?: (runConfiguration.project.basePath + "/target/pseudoOutDir") // TODO: try to get an actual thing from build info
         runWriteAction {
             VfsUtil.createDirectoryIfMissing(outDir) // TODO: is this a good idea?
         }
@@ -50,10 +52,15 @@ class CustomBuildCommandState(
     //   Like, we should already know what should be run when creating the configuration?
     //   oooor nope cause the build wasn't run at that point yet?
     private fun customBuildBinPath(): String {
+
+        // TODO: // val artifacts = environment.artifacts!! // TODO: ?
+
+        val artifacts2 = environment.artifacts // TODO: let's check if its still empty?
+
         val artifacts = ARTIFACTS_MESSAGES_HACK
         assert(artifacts.isNotEmpty()) // TODO: we're assuming that the build was finished at this point. is it a good idea?
 
-        // TODO: what if there are none? needs proper handling
+        // TODO: what if there are none? or many?? needs proper handling
         val artifactMessages = artifacts.find { message -> message.target.cleanKind == CargoMetadata.TargetKind.CUSTOM_BUILD }!!
 
         val binPath = artifactMessages.executables[0] // TODO: un-hardcode
