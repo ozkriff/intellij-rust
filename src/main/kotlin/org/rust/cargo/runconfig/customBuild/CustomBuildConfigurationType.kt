@@ -10,13 +10,13 @@ import com.intellij.execution.configurations.ConfigurationTypeBase
 import com.intellij.execution.configurations.ConfigurationTypeUtil
 import com.intellij.execution.configurations.RunConfiguration
 import com.intellij.openapi.project.Project
-import org.rust.ide.icons.RsIcons
+import org.rust.cargo.icons.CargoIcons
 
 class CustomBuildConfigurationType : ConfigurationTypeBase(
     "CustomBuildRunConfiguration",
     "custom-build",
     "custom build run configuration",
-    RsIcons.RUST // TODO: ?
+    CargoIcons.BUILD_RS_ICON
 ) {
     init {
         addFactory(CustomBuildConfigurationFactory(this))

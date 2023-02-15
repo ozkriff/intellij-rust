@@ -1095,11 +1095,17 @@
 
         <!-- Run Configurations -->
 
+        <!-- TODO: experiment to set correct order as a tmp hack. move down later or leave if works fine.
+                   maybe it'll be easier to `if (profile is CustomBuildCommandConfiguration) return false`
+                   into other runners eventually?
+        -->
+        <programRunner implementation="org.rust.cargo.runconfig.customBuild.CustomBuildRunner"/>
+
         <programRunner implementation="org.rust.cargo.runconfig.CargoCommandRunner"/>
         <programRunner implementation="org.rust.cargo.runconfig.CargoTestCommandRunner"/>
         <programRunner implementation="org.rust.ide.debugger.runconfig.RsDebugAdvertisingRunner"/>
         <programRunner implementation="org.rust.cargo.runconfig.wasmpack.WasmPackCommandRunner"/>
-        <programRunner implementation="org.rust.cargo.runconfig.customBuild.CustomBuildRunner"/>
+        <!-- TODO: <programRunner implementation="org.rust.cargo.runconfig.customBuild.CustomBuildRunner"/> was here initially -->
 
         <configurationType implementation="org.rust.cargo.runconfig.command.CargoCommandConfigurationType"/>
         <configurationType implementation="org.rust.cargo.runconfig.wasmpack.WasmPackCommandConfigurationType"/>
@@ -1109,9 +1115,6 @@
                 implementation="org.rust.cargo.runconfig.command.CompositeCargoRunConfigurationProducer"/>
         <!-- To register a new producer, add it to the `producers` list in the `CompositeCargoRunConfigurationProducer`
              producer instead of registering it here. -->
-        <!-- TODO: Do I need to move my thing into CompositeCargoRunConfigurationProducer or it's separate enough? -->
-        <runConfigurationProducer
-            implementation="org.rust.cargo.runconfig.customBuild.CustomBuildRunConfigurationProducer"/>
 
         <stepsBeforeRunProvider implementation="org.rust.cargo.runconfig.buildtool.CargoBuildTaskProvider"/>
         <stepsBeforeRunProvider implementation="org.rust.cargo.runconfig.wasmpack.WasmPackBuildTaskProvider"/>

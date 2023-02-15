@@ -32,6 +32,33 @@ class RunConfigurationTest : RunConfigurationTestBase() {
         check("Hello, world!" in result.stdout)
     }
 
+    // TODO: add more checks
+    //       - caret in main.rs shouldn't create a CustomBuildRunConfiguration
+    //       - workspace with many build.rs files in different order, for example
+    //       - ?
+    fun `test build script configuration run basic`() {
+        val testProject = fileTree {
+            toml("Cargo.toml", """
+                [package]
+                name = "hello-build-rs"
+                version = "0.1.0"
+                authors = []
+            """)
+            rust("build.rs", """
+                fn main() { println!("Hello from build.rs"); } /*caret*/
+            """)
+            dir("src") {
+                rust("main.rs", """
+                    fn main() { println!("Hello from main.rs"); }
+                """)
+            }
+        }.create()
+        myFixture.configureFromTempProjectFile(testProject.fileWithCaret)
+        val result = executeAndGetOutput(createCustomBuildRunConfigurationFromContext())
+        check("Hello from build.rs" in result.stdout)
+        check("Hello from main.rs" !in result.stdout)
+    }
+
     fun `test single test configuration 1`() {
         val testProject = fileTree {
             toml("Cargo.toml", """

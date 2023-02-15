@@ -13,6 +13,7 @@ import com.intellij.execution.actions.ConfigurationFromContext
 import com.intellij.execution.configurations.RunConfiguration
 import com.intellij.openapi.util.Ref
 import com.intellij.psi.PsiElement
+import org.rust.cargo.runconfig.customBuild.CustomBuildRunConfigurationProducer
 import org.rust.cargo.runconfig.test.CargoBenchRunConfigurationProducer
 import org.rust.cargo.runconfig.test.CargoTestRunConfigurationProducer
 import java.util.*
@@ -29,6 +30,7 @@ class CompositeCargoRunConfigurationProducer : CargoRunConfigurationProducer() {
     private val producers: List<CargoRunConfigurationProducer> =
         listOf(
             CargoExecutableRunConfigurationProducer(),
+            CustomBuildRunConfigurationProducer(),
             CargoTestRunConfigurationProducer(),
             CargoBenchRunConfigurationProducer()
         )
