@@ -47,7 +47,7 @@ abstract class RsExecutableRunner(
 
     override fun execute(environment: ExecutionEnvironment) {
 
-        val state = environment.state as CargoRunStateBase
+        val state = environment.state as CargoRunStateBase // NOTE:
         val project = environment.project
         val host = project.computeWithCancelableProgress("Checking if toolchain is supported...") {
             state.rustVersion()?.host.orEmpty()

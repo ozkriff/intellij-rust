@@ -12,8 +12,6 @@ import com.intellij.execution.runners.ExecutionEnvironment
 import com.intellij.execution.ui.RunContentDescriptor
 import org.rust.cargo.runconfig.RsExecutableRunner
 
-// TODO: отнаследуйся от RsExecRunner !!!!!!!!!!!
-
 private const val ERROR_MESSAGE_TITLE: String = "Unable to run Custom Build Script"
 
 class CustomBuildRunner : RsExecutableRunner(DefaultRunExecutor.EXECUTOR_ID, ERROR_MESSAGE_TITLE) {
@@ -22,7 +20,10 @@ class CustomBuildRunner : RsExecutableRunner(DefaultRunExecutor.EXECUTOR_ID, ERR
     override fun canRun(executorId: String, profile: RunProfile): Boolean {
         // if (executorId != this.runnerId || profile !is BuildScriptCommandConfiguration ||
         //     profile.clean() !is CargoCommandConfiguration.CleanConfiguration.Ok) return false
-        if (executorId != this.runnerId || profile !is CustomBuildCommandConfiguration) return false
+
+        // if (executorId != this.runnerId || profile !is CustomBuildCommandConfiguration) return false
+
+        if (executorId != DefaultRunExecutor.EXECUTOR_ID || profile !is CustomBuildCommandConfiguration) return false
 
         // TODO: only allow Run conf for now
 
@@ -37,8 +38,8 @@ class CustomBuildRunner : RsExecutableRunner(DefaultRunExecutor.EXECUTOR_ID, ERR
     override fun execute(environment: ExecutionEnvironment) {
         // TODO: extract the info about our target from "environment.artifacts" here!
 
-        val artifacts = environment.artifacts
-        val n = 1
+        // val artifacts = environment.artifacts
+        // val n = 1
 
         // if (Cargo.checkNeedInstallWasmPack(environment.project)) return
         //TODO("do some stuff here!")
@@ -49,8 +50,8 @@ class CustomBuildRunner : RsExecutableRunner(DefaultRunExecutor.EXECUTOR_ID, ERR
     }
 
     override fun doExecute(state: RunProfileState, environment: ExecutionEnvironment): RunContentDescriptor? {
-        val artifacts = environment.artifacts
-        val n = 1
+        // val artifacts = environment.artifacts
+        // val n = 1
         return super.doExecute(state, environment)
     }
 
