@@ -12,7 +12,7 @@ import com.intellij.ui.layout.panel
 import javax.swing.JComponent
 
 class CustomBuildConfigurationEditor(val project: Project)
-    : SettingsEditor<CustomBuildCommandConfiguration>() {
+    : SettingsEditor<CustomBuildConfiguration>() {
 
     // private val pathBin: JBTextField = JBTextField() // TODO: impl later?
     private val pathOutDir: JBTextField = JBTextField()
@@ -29,13 +29,14 @@ class CustomBuildConfigurationEditor(val project: Project)
         }
     }
 
-    override fun resetEditorFrom(configuration: CustomBuildCommandConfiguration) {
+    override fun resetEditorFrom(configuration: CustomBuildConfiguration) {
         pathOutDir.text = configuration.outDir ?: ""
     }
 
+    // !
     // TODO: wtf the id of the configuration is different every time
     //       I hit a bp in `applyEditorTo`? does it happen in a normal rust runconf?
-    override fun applyEditorTo(configuration: CustomBuildCommandConfiguration) {
+    override fun applyEditorTo(configuration: CustomBuildConfiguration) {
         configuration.outDir = pathOutDir.text.ifEmpty { null }
         if (configuration.outDir != null) {
             val n = 1

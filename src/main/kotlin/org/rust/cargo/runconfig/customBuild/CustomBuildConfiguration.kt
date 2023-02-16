@@ -12,11 +12,11 @@ import com.intellij.execution.configurations.ConfigurationFactory
 import com.intellij.execution.configurations.RunConfiguration
 import com.intellij.openapi.options.SettingsEditor
 import com.intellij.openapi.project.Project
-import org.rust.cargo.project.workspace.CargoWorkspace
+import com.intellij.openapi.vfs.VirtualFile
 import org.rust.cargo.runconfig.command.CargoCommandConfiguration
 
 // TODO: rename. no need for "Command" part anymore, right?
-class CustomBuildCommandConfiguration(
+class CustomBuildConfiguration(
     project: Project,
     name: String,
     factory: ConfigurationFactory
@@ -36,9 +36,11 @@ class CustomBuildCommandConfiguration(
     // TODO: We need to store package or build.rs file in the configuration itself
     //       so it'd be possible to identify our thing.
     // fun canBeFrom(cmd: CargoCommandLine): Boolean =
-    fun canBeFrom(pkg: CargoWorkspace.Package): Boolean =
+    fun canBeFrom(crateRoot: VirtualFile): Boolean =
         // TODO: lets try always returning true for now.
         //       needs to be fixed later, something should to be checked (package? target?)
+
+        // TODO: crateRoot == project.?
 
         // command == ParametersListUtil.join(cmd.command, *cmd.additionalArguments.toTypedArray())
 

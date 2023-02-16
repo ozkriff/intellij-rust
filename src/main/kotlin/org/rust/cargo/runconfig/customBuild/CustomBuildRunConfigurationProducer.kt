@@ -26,13 +26,13 @@ class CustomBuildRunConfigurationProducer: CargoRunConfigurationProducer() {
     }
 
     override fun isConfigurationFromContext(configuration: CargoCommandConfiguration, context: ConfigurationContext): Boolean {
-        if (configuration !is CustomBuildCommandConfiguration) return false
+        if (configuration !is CustomBuildConfiguration) return false
 
         val location = context.location ?: return false
         val target = findCustomBuildTarget(location) ?: return false
 
         // return configuration.canBeFrom(target.cargoCommandLine) // TODO: what should be passed here?
-        return configuration.canBeFrom(target.pkg)
+        return configuration.canBeFrom(target.crateRoot)
     }
 
     // TODO: what exactly should be done here?
@@ -41,6 +41,8 @@ class CustomBuildRunConfigurationProducer: CargoRunConfigurationProducer() {
         context: ConfigurationContext,
         sourceElement: Ref<PsiElement>
     ): Boolean {
+        if (configuration !is CustomBuildConfiguration) return false // TODO: do additional settings here?
+
         val location = context.location ?: return false
         val target = findCustomBuildTarget(location) ?: return false
         val fn = location.psiElement.ancestorStrict<RsFunction>()
@@ -63,7 +65,9 @@ class CustomBuildRunConfigurationProducer: CargoRunConfigurationProducer() {
     private class ExecutableTarget(target: CargoWorkspace.Target) {
         val configurationName: String = "Run ${target.name}"
 
-        // TODO: выковырять сюда какой-то путь и его сравнивать в canBeFrom
+        // TODO: take some path and save it - and use later in comparison in canBeFrom
+
+        val crateRoot: VirtualFile = target.crateRoot!! // TODO: handle error properly
 
         val pkg: CargoWorkspace.Package = target.pkg
     }

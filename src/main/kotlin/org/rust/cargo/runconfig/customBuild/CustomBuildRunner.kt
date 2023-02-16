@@ -29,7 +29,7 @@ class CustomBuildRunner : RsExecutableRunner(DefaultRunExecutor.EXECUTOR_ID, ERR
 
     override fun canRun(executorId: String, profile: RunProfile): Boolean {
         if (executorId != DefaultRunExecutor.EXECUTOR_ID ||
-            profile !is CustomBuildCommandConfiguration ||
+            profile !is CustomBuildConfiguration ||
             profile.clean() !is CargoCommandConfiguration.CleanConfiguration.Ok) return false
         return profile.isBuildToolWindowAvailable
     }

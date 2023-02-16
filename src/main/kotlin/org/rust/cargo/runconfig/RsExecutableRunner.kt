@@ -60,12 +60,12 @@ abstract class RsExecutableRunner(
         super.execute(environment)
     }
 
-    // TODO: в вынести начальные строки с поиском нужного бинаря в отдельную функцию
-    //       и потом в зависимости от раннера делать что хочу
+    // TODO: Move out first lines that find a correct binary into a separate method in parent
+    //       and do whatever I want with it in different runners
     override fun doExecute(state: RunProfileState, environment: ExecutionEnvironment): RunContentDescriptor? {
         if (state !is CargoRunStateBase) return null
 
-        // TODO: позволить кастомизировать вот эти три строчки и положить в binaries свой кастомный бинарь, остальные строчки переиспользовать отсюда.
+        // TODO: allow customizing these couple of lines so I can put my own binary here, reuse all other lines in parent
         val artifacts = environment.artifacts.orEmpty()
         val artifact = artifacts.firstOrNull()
         val binaries = artifact?.executables.orEmpty()
@@ -132,7 +132,7 @@ abstract class RsExecutableRunner(
         project.showErrorDialog(toolchainError.message)
     }
 
-    // TODO: tmp hack, think later
+    // TODO: tmp hack, think later. probably will be reverted after the `doExecute` refactoring
     protected fun Project.showErrorDialog(@Suppress("UnstableApiUsage") @DialogMessage message: String) {
         Messages.showErrorDialog(this, message, errorMessageTitle)
     }
