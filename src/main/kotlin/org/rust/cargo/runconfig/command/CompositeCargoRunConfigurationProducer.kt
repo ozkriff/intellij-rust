@@ -13,11 +13,15 @@ import com.intellij.execution.actions.ConfigurationFromContext
 import com.intellij.execution.configurations.RunConfiguration
 import com.intellij.openapi.util.Ref
 import com.intellij.psi.PsiElement
-import org.rust.cargo.runconfig.customBuild.CustomBuildRunConfigurationProducer
 import org.rust.cargo.runconfig.test.CargoBenchRunConfigurationProducer
 import org.rust.cargo.runconfig.test.CargoTestRunConfigurationProducer
 import java.util.*
 import java.util.function.Function
+
+// TODO: Can I find a proper way to incorporate CustomBuild* here?
+//       The issue is that the whole CompositeCargoRunConfigurationProducer
+//       inherits CargoRunConfigurationProducer, so custom build stuff is filtered
+//       out too early.
 
 /**
  * This class aggregates other Rust run configuration [producers] and manages the search & creation of run
@@ -30,7 +34,7 @@ class CompositeCargoRunConfigurationProducer : CargoRunConfigurationProducer() {
     private val producers: List<CargoRunConfigurationProducer> =
         listOf(
             CargoExecutableRunConfigurationProducer(),
-            CustomBuildRunConfigurationProducer(),
+
             CargoTestRunConfigurationProducer(),
             CargoBenchRunConfigurationProducer()
         )

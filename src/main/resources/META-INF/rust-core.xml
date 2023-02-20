@@ -1116,6 +1116,10 @@
         <!-- To register a new producer, add it to the `producers` list in the `CompositeCargoRunConfigurationProducer`
              producer instead of registering it here. -->
 
+        <!-- TODO: it's temporary. probably. see TODO in CustomBuildRunConfigurationProducer -->
+        <runConfigurationProducer
+            implementation="org.rust.cargo.runconfig.customBuild.CustomBuildRunConfigurationProducer"/>
+
         <stepsBeforeRunProvider implementation="org.rust.cargo.runconfig.buildtool.CargoBuildTaskProvider"/>
         <stepsBeforeRunProvider implementation="org.rust.cargo.runconfig.wasmpack.WasmPackBuildTaskProvider"/>
 
