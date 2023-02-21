@@ -15,16 +15,6 @@ import org.rust.lang.core.psi.ext.elementType
 
 // TODO: test project for now is /home/ozkriff/CLionProjects/build-rs-run-debug
 
-// NOTE: от Эльдара
-// > есть вариант: подсунуть врапер программу (через переменные окружения или еще что)
-// > и вставлять вызов gdb сервера.
-// > кажется, что-то похожее в котлине делает крилл шмагов.
-// > безобидное изменение протащить в апстрим карго.
-// > контракт: что-то, что вызывает build-rs скрипт
-// > в gdb есть настройка wrapper program - посмотри ее доки.
-
-// TODO: Do  really need Rs prefix here? Rename to CustomBuildRunLineMarkerContributor or something.
-
 class CustomBuildRunLineMarkerContributor : RunLineMarkerContributor() {
     override fun getInfo(element: PsiElement): Info? {
         if (element.elementType != IDENTIFIER) return null
