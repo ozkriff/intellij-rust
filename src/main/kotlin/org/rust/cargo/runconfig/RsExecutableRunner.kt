@@ -17,6 +17,7 @@ import com.intellij.openapi.ui.Messages
 import com.intellij.openapi.util.Key
 import com.intellij.openapi.util.NlsContexts.DialogMessage
 import org.rust.cargo.project.model.cargoProjects
+import org.rust.cargo.project.workspace.CargoWorkspace
 import org.rust.cargo.project.workspace.PackageOrigin
 import org.rust.cargo.runconfig.buildtool.CargoBuildManager.getBuildConfiguration
 import org.rust.cargo.runconfig.buildtool.CargoBuildManager.isBuildConfiguration
@@ -28,6 +29,7 @@ import org.rust.cargo.toolchain.tools.Cargo.Companion.getCargoCommonPatch
 import org.rust.cargo.util.CargoArgsParser.Companion.parseArgs
 import org.rust.openapiext.computeWithCancelableProgress
 import org.rust.stdext.toPath
+import java.nio.file.Path
 import java.util.concurrent.CompletableFuture
 
 abstract class RsExecutableRunner(
@@ -60,6 +62,8 @@ abstract class RsExecutableRunner(
         super.execute(environment)
     }
 
+    // TODO protected open fun getBinaryToRun(): Path {...
+
     // TODO: Move out first lines that find a correct binary into a separate method in parent
     //       and do whatever I want with it in different runners
     override fun doExecute(state: RunProfileState, environment: ExecutionEnvironment): RunContentDescriptor? {
@@ -79,17 +83,14 @@ abstract class RsExecutableRunner(
             else -> null
         }
 
+        // TODO: need to do some filtering for the debug builds to work here, right?
         val errorMessage = checkErrors(artifacts, "artifact") ?: checkErrors(binaries, "binary")
         if (errorMessage != null) {
             environment.project.showErrorDialog(errorMessage)
             return null
         }
 
-        val pkg = artifact?.package_id?.let { id ->
-            environment.project.cargoProjects.allProjects
-                .mapNotNull { it.workspace?.findPackageById(id) }
-                .firstOrNull { it.origin == PackageOrigin.WORKSPACE }
-        }
+        val pkg = findPackage(artifact, environment)
 
         val runCargoCommand = state.prepareCommandLine().copy(emulateTerminal = false)
         val workingDirectory = pkg?.rootDirectory
@@ -110,6 +111,14 @@ abstract class RsExecutableRunner(
         )
 
         return showRunContent(state, environment, runExecutable)
+    }
+
+    protected fun findPackage(artifact: CompilerArtifactMessage?, environment: ExecutionEnvironment): CargoWorkspace.Package? {
+        return artifact?.package_id?.let { id ->
+            environment.project.cargoProjects.allProjects
+                .mapNotNull { it.workspace?.findPackageById(id) }
+                .firstOrNull { it.origin == PackageOrigin.WORKSPACE }
+        }
     }
 
     protected open fun showRunContent(
