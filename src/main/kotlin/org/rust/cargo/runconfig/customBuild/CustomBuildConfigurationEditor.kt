@@ -14,15 +14,10 @@ import javax.swing.JComponent
 class CustomBuildConfigurationEditor(val project: Project)
     : SettingsEditor<CustomBuildConfiguration>() {
 
-    // private val pathBin: JBTextField = JBTextField() // TODO: impl later?
     private val pathOutDir: JBTextField = JBTextField()
 
     override fun createEditor(): JComponent = panel {
         // TODO: move all visible text to translation files
-        row("Path to build script executable (TODO later):") {
-            // TODO: add a path text field here (see pathTextField or something similar)
-            // pathBin()
-        }
         row("Path to OUT_DIR (TODO make actually work):") {
             // TODO: add a path text field here (see pathTextField or something similar)
             pathOutDir()
