@@ -5,17 +5,13 @@
 
 package org.rust.cargo.runconfig.customBuild
 
-// import org.rust.cargo.runconfig.CargoAwareConfiguration
-// import org.rust.cargo.runconfig.ParsedCommand
-import com.intellij.execution.BeforeRunTask
 import com.intellij.execution.configurations.ConfigurationFactory
 import com.intellij.execution.configurations.RunConfiguration
 import com.intellij.openapi.options.SettingsEditor
 import com.intellij.openapi.project.Project
-import com.intellij.openapi.vfs.VirtualFile
+import org.rust.cargo.project.workspace.CargoWorkspace
 import org.rust.cargo.runconfig.command.CargoCommandConfiguration
 
-// TODO: rename. no need for "Command" part anymore, right?
 class CustomBuildConfiguration(
     project: Project,
     name: String,
@@ -23,26 +19,20 @@ class CustomBuildConfiguration(
 ) : CargoCommandConfiguration(project, name, factory) {
     override var command: String = "run" // TODO: it's a hack. not sure if a good idea
 
+    private var target: CargoWorkspace.Target? = null // TODO: is it ok to have a null by default here?
+
     // var outDir: String = project.basePath + "/target/pseudoOutDir" // TODO: un-hack
     var outDir: String? = null // TODO: let's try keeping it empty by default and only assign an actual value when used
-
-    override fun setBeforeRunTasks(value: MutableList<BeforeRunTask<*>>) {
-        super.setBeforeRunTasks(value)
-    }
 
     override fun getConfigurationEditor(): SettingsEditor<out RunConfiguration> =
         CustomBuildConfigurationEditor(project)
 
-    // TODO: We need to store package or build.rs file in the configuration itself
-    //       so it'd be possible to identify our thing.
-    // fun canBeFrom(cmd: CargoCommandLine): Boolean =
-    fun canBeFrom(crateRoot: VirtualFile): Boolean =
-        // TODO: lets try always returning true for now.
-        //       needs to be fixed later, something should to be checked (package? target?)
+    fun canBeFrom(target: CargoWorkspace.Target): Boolean {
+        return target == this.target
+    }
 
-        // TODO: crateRoot == project.?
-
-        // command == ParametersListUtil.join(cmd.command, *cmd.additionalArguments.toTypedArray())
-
-        true
+    fun setTarget(target: CargoWorkspace.Target) {
+        this.target = target
+        name = target.name + " (build.rs)" // TODO: good name? translation?
+    }
 }

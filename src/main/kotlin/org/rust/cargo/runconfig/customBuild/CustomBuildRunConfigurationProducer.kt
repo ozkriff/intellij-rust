@@ -31,17 +31,16 @@ class CustomBuildRunConfigurationProducer: CargoRunConfigurationProducer() {
         val location = context.location ?: return false
         val target = findCustomBuildTarget(location) ?: return false
 
-        // return configuration.canBeFrom(target.cargoCommandLine) // TODO: what should be passed here?
-        return configuration.canBeFrom(target.crateRoot)
+        // TODO: what should be passed here?
+        return configuration.canBeFrom(target)
     }
 
-    // TODO: what exactly should be done here?
     override fun setupConfigurationFromContext(
         configuration: CargoCommandConfiguration,
         context: ConfigurationContext,
         sourceElement: Ref<PsiElement>
     ): Boolean {
-        if (configuration !is CustomBuildConfiguration) return false // TODO: do additional settings here?
+        if (configuration !is CustomBuildConfiguration) return false
 
         val location = context.location ?: return false
         val target = findCustomBuildTarget(location) ?: return false
@@ -49,11 +48,8 @@ class CustomBuildRunConfigurationProducer: CargoRunConfigurationProducer() {
         val source = if (fn != null && isBuildScriptMainFunction(fn)) fn else context.psiLocation?.containingFile
         sourceElement.set(source)
 
-        // NOTE
-        // configuration.name = target.configurationName
+        configuration.setTarget(target); // TODO: !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-        // val cmd = target.cargoCommandLine.mergeWithDefault(configuration)
-        // configuration.setFromCmd(cmd) // TODO: ?
         return true
     }
 
@@ -62,33 +58,23 @@ class CustomBuildRunConfigurationProducer: CargoRunConfigurationProducer() {
     //     return super.findExistingConfiguration(context)
     // }
 
-    private class ExecutableTarget(target: CargoWorkspace.Target) {
-        val configurationName: String = "Run ${target.name}"
-
-        // TODO: take some path and save it - and use later in comparison in canBeFrom
-
-        val crateRoot: VirtualFile = target.crateRoot!! // TODO: handle error properly
-
-        val pkg: CargoWorkspace.Package = target.pkg
-    }
-
     companion object {
         fun isBuildScriptMainFunction(fn: RsFunction): Boolean {
             val ws = fn.cargoWorkspace ?: return false
             return fn.parent is RsFile && fn.name == "main" && findCustomBuildTarget(ws, fn.containingFile.virtualFile) != null
         }
 
-        private fun findCustomBuildTarget(location: Location<*>): ExecutableTarget? {
+        private fun findCustomBuildTarget(location: Location<*>): CargoWorkspace.Target? {
             val file = location.virtualFile ?: return null
             val rsFile = file.toPsiFile(location.project) as? RsFile ?: return null
             val ws = rsFile.cargoWorkspace ?: return null
             return findCustomBuildTarget(ws, file)
         }
 
-        private fun findCustomBuildTarget(ws: CargoWorkspace, file: VirtualFile): ExecutableTarget? {
+        private fun findCustomBuildTarget(ws: CargoWorkspace, file: VirtualFile): CargoWorkspace.Target? {
             val target = ws.findTargetByCrateRoot(file) ?: return null
             if (!target.kind.isCustomBuild) return null
-            return ExecutableTarget(target)
+            return target
         }
     }
 }
