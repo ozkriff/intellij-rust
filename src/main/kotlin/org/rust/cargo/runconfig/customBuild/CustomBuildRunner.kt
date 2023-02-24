@@ -52,9 +52,12 @@ class CustomBuildRunner : RsExecutableRunner(DefaultRunExecutor.EXECUTOR_ID, ERR
         val artifact = artifacts.firstOrNull()
         // val binaries = artifact?.executables.orEmpty()
 
+        if (state.runConfiguration !is CustomBuildConfiguration) return null
+
         val pkg = findPackage(artifact, environment)
 
-        val outDir = pkg?.outDir?.pathAsPath?.toString()
+        val outDir = state.runConfiguration.outDir
+            ?: pkg?.outDir?.pathAsPath?.toString()
             ?: (environment.project.basePath + "/target/pseudoOutDir") // TODO: handle properly
 
         val runCargoCommand = state.prepareCommandLine().copy(emulateTerminal = false)

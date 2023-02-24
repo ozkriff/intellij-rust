@@ -21,8 +21,8 @@ class CustomBuildConfiguration(
 
     private var target: CargoWorkspace.Target? = null // TODO: is it ok to have a null by default here?
 
-    // var outDir: String = project.basePath + "/target/pseudoOutDir" // TODO: un-hack
-    var outDir: String? = null // TODO: let's try keeping it empty by default and only assign an actual value when used
+    var outDir: String? = null
+        private set
 
     override fun getConfigurationEditor(): SettingsEditor<out RunConfiguration> =
         CustomBuildConfigurationEditor(project)
