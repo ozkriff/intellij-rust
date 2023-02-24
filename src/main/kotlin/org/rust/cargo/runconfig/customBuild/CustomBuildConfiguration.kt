@@ -9,8 +9,11 @@ import com.intellij.execution.configurations.ConfigurationFactory
 import com.intellij.execution.configurations.RunConfiguration
 import com.intellij.openapi.options.SettingsEditor
 import com.intellij.openapi.project.Project
+import org.jdom.Element
 import org.rust.cargo.project.workspace.CargoWorkspace
 import org.rust.cargo.runconfig.command.CargoCommandConfiguration
+import org.rust.cargo.runconfig.readString
+import org.rust.cargo.runconfig.writeString
 
 class CustomBuildConfiguration(
     project: Project,
@@ -27,12 +30,22 @@ class CustomBuildConfiguration(
     override fun getConfigurationEditor(): SettingsEditor<out RunConfiguration> =
         CustomBuildConfigurationEditor(project)
 
-    fun canBeFrom(target: CargoWorkspace.Target): Boolean {
-        return target == this.target
-    }
+    fun canBeFrom(target: CargoWorkspace.Target): Boolean =
+        target.crateRoot?.url == this.crateRootUrl
 
     fun setTarget(target: CargoWorkspace.Target) {
-        this.target = target
+        this.crateRootUrl = target.crateRoot?.url
+        // TODO: do we need additions here orr?
         name = target.name + " (build.rs)" // TODO: good name? translation?
+    }
+
+    override fun writeExternal(element: Element) {
+        super.writeExternal(element)
+        element.writeString("outDir", outDir ?: "")
+    }
+
+    override fun readExternal(element: Element) {
+        super.readExternal(element)
+        element.readString("outDir")?.let { outDir = it }
     }
 }
