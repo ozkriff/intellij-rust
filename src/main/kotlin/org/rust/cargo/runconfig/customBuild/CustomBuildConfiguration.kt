@@ -22,7 +22,7 @@ class CustomBuildConfiguration(
 ) : CargoCommandConfiguration(project, name, factory) {
     override var command: String = "run" // TODO: it's a hack. not sure if a good idea
 
-    private var target: CargoWorkspace.Target? = null // TODO: is it ok to have a null by default here?
+    private var crateRootUrl: String? = null
 
     var outDir: String? = null
         private set
@@ -42,10 +42,12 @@ class CustomBuildConfiguration(
     override fun writeExternal(element: Element) {
         super.writeExternal(element)
         element.writeString("outDir", outDir ?: "")
+        element.writeString("crateRootUrl", crateRootUrl ?: "")
     }
 
     override fun readExternal(element: Element) {
         super.readExternal(element)
         element.readString("outDir")?.let { outDir = it }
+        element.readString("crateRootUrl")?.let { crateRootUrl = it }
     }
 }

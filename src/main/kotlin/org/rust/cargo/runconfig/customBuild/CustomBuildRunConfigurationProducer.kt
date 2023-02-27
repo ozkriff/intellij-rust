@@ -27,11 +27,9 @@ class CustomBuildRunConfigurationProducer: CargoRunConfigurationProducer() {
 
     override fun isConfigurationFromContext(configuration: CargoCommandConfiguration, context: ConfigurationContext): Boolean {
         if (configuration !is CustomBuildConfiguration) return false
-
         val location = context.location ?: return false
         val target = findCustomBuildTarget(location) ?: return false
 
-        // TODO: what should be passed here?
         return configuration.canBeFrom(target)
     }
 
@@ -48,7 +46,7 @@ class CustomBuildRunConfigurationProducer: CargoRunConfigurationProducer() {
         val source = if (fn != null && isBuildScriptMainFunction(fn)) fn else context.psiLocation?.containingFile
         sourceElement.set(source)
 
-        configuration.setTarget(target); // TODO: !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        configuration.setTarget(target);
 
         return true
     }
