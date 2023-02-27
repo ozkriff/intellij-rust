@@ -60,7 +60,9 @@ class CustomBuildRunner : RsExecutableRunner(DefaultRunExecutor.EXECUTOR_ID, ERR
             ?: pkg?.outDir?.pathAsPath?.toString()
             ?: (environment.project.basePath + "/target/pseudoOutDir") // TODO: handle properly
 
-        val runCargoCommand = state.prepareCommandLine().copy(emulateTerminal = false)
+        // val runCargoCommand = state.prepareCommandLine().copy(emulateTerminal = false)
+        val runCargoCommand = state.prepareCommandLine().copy(emulateTerminal = true) // TODO: ugh
+
         val workingDirectory = pkg?.rootDirectory
             ?.takeIf { runCargoCommand.command == "test" }
             ?: runCargoCommand.workingDirectory
