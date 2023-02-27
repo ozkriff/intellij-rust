@@ -25,7 +25,6 @@ class CustomBuildConfiguration(
     private var crateRootUrl: String? = null
 
     var outDir: String? = null
-        private set
 
     override fun getConfigurationEditor(): SettingsEditor<out RunConfiguration> =
         CustomBuildConfigurationEditor(project)
@@ -34,9 +33,8 @@ class CustomBuildConfiguration(
         target.crateRoot?.url == this.crateRootUrl
 
     fun setTarget(target: CargoWorkspace.Target) {
-        this.crateRootUrl = target.crateRoot?.url
-        // TODO: do we need additions here orr?
-        name = target.name + " (build.rs)" // TODO: good name? translation?
+        crateRootUrl = target.crateRoot?.url
+        name = target.pkg.name + "'s build.rs" // TODO: translation?
     }
 
     override fun writeExternal(element: Element) {
