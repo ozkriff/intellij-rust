@@ -34,7 +34,6 @@ class RunConfigurationTest : RunConfigurationTestBase() {
 
     // TODO: add more checks
     //       - caret in main.rs shouldn't create a CustomBuildRunConfiguration
-    //       - workspace with many build.rs files in different order, for example
     //       - ?
     fun `test build script configuration run basic`() {
         val testProject = fileTree {
@@ -42,7 +41,6 @@ class RunConfigurationTest : RunConfigurationTestBase() {
                 [package]
                 name = "hello-build-rs"
                 version = "0.1.0"
-                authors = []
             """)
             rust("build.rs", """
                 fn main() { println!("Hello from build.rs"); } /*caret*/
@@ -57,6 +55,48 @@ class RunConfigurationTest : RunConfigurationTestBase() {
         val result = executeAndGetOutput(createCustomBuildRunConfigurationFromContext())
         check("Hello from build.rs" in result.stdout)
         check("Hello from main.rs" !in result.stdout)
+    }
+
+    fun `test build script configuration run in workspace`() {
+        val testProject = fileTree {
+            toml("Cargo.toml", """
+                [workspace]
+                members = ["a", "b"]
+            """)
+            dir("a") {
+                toml("Cargo.toml", """
+                    [package]
+                    name = "a"
+                    version = "0.1.0"
+                """)
+                rust("build.rs", """
+                    fn main() { println!("Hello from a/build.rs"); }
+                """)
+                dir("src") {
+                    rust("main.rs", """
+                        fn main() { println!("Hello from a/main.rs"); }
+                    """)
+                }
+            }
+            dir("b") {
+                toml("Cargo.toml", """
+                    [package]
+                    name = "b"
+                    version = "0.1.0"
+                """)
+                rust("build.rs", """
+                    fn main() { println!("Hello from b/build.rs"); } /*caret*/
+                """)
+                dir("src") {
+                    rust("main.rs", """
+                        fn main() { println!("Hello from b/main.rs"); }
+                    """)
+                }
+            }
+        }.create()
+        myFixture.configureFromTempProjectFile(testProject.fileWithCaret)
+        val result = executeAndGetOutput(createCustomBuildRunConfigurationFromContext())
+        check("Hello from b/build.rs" in result.stdout)
     }
 
     fun `test single test configuration 1`() {
