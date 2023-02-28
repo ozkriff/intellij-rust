@@ -18,6 +18,7 @@ class CustomBuildConfigurationEditor(val project: Project)
 
     override fun createEditor(): JComponent = panel {
         // TODO: move all visible text to translation files
+        // TODO: add checkbox that is off by default
         row("Path to OUT_DIR (TODO make actually work):") {
             // TODO: add a path text field here (see pathTextField or something similar)
             pathOutDir()
@@ -28,15 +29,8 @@ class CustomBuildConfigurationEditor(val project: Project)
         pathOutDir.text = configuration.outDir ?: ""
     }
 
-    // !
-    // TODO: wtf the id of the configuration is different every time
-    //       I hit a bp in `applyEditorTo`? does it happen in a normal rust runconf?
     override fun applyEditorTo(configuration: CustomBuildConfiguration) {
         configuration.outDir = pathOutDir.text.ifEmpty { null }
-        if (configuration.outDir != null) {
-            val n = 1
-        }
-        // configuration.command = pathBin.text
     }
 }
 

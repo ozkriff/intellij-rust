@@ -14,7 +14,7 @@ import org.rust.cargo.runconfig.CargoRunStateBase
 import org.rust.cargo.runconfig.RsExecutableRunner
 import org.rust.cargo.runconfig.buildtool.CargoBuildManager.isBuildToolWindowAvailable
 import org.rust.cargo.runconfig.command.CargoCommandConfiguration
-import org.rust.cargo.toolchain.impl.CargoMetadata
+import org.rust.cargo.toolchain.impl.CargoMetadata.TargetKind.CUSTOM_BUILD
 import org.rust.cargo.util.CargoArgsParser
 import org.rust.openapiext.pathAsPath
 import org.rust.stdext.toPath
@@ -34,10 +34,24 @@ class CustomBuildRunner : RsExecutableRunner(DefaultRunExecutor.EXECUTOR_ID, ERR
     }
 
     override fun doExecute(state: RunProfileState, environment: ExecutionEnvironment): RunContentDescriptor? {
+        if (state !is CargoRunStateBase) return null
+        if (state.runConfiguration !is CustomBuildConfiguration) return null
 
-        // TODO: handle err better than just `!!`
+        val crateRootUrl = state.runConfiguration.crateRootUrl
+
+        // TODO: move this logic out of here, artifacts need to be filtered before doExecute.
         val artifacts = environment.artifacts.orEmpty()
-        val artifactMessages = artifacts.find { message -> message.target.cleanKind == CargoMetadata.TargetKind.CUSTOM_BUILD }!! // TODO: find actual package I need
+        val artifactMessages = artifacts.find { message ->
+            val isCustomBuild = message.target.cleanKind == CUSTOM_BUILD
+            val isCorrectCrate = "file://" + message.target.src_path == crateRootUrl
+            isCustomBuild && isCorrectCrate
+        }
+
+        if (artifactMessages == null || artifactMessages.filenames.size != 1) {
+            // TODO: better msg + translation
+            environment.project.showErrorDialog("Error: no corresponding build script artifact found")
+            return null
+        }
         val exePath = artifactMessages.filenames[0]
 
         // --------------------------
@@ -46,13 +60,9 @@ class CustomBuildRunner : RsExecutableRunner(DefaultRunExecutor.EXECUTOR_ID, ERR
 
         // ------------------------------
 
-        if (state !is CargoRunStateBase) return null
-
         // val artifacts = environment.artifacts.orEmpty()
         val artifact = artifacts.firstOrNull()
         // val binaries = artifact?.executables.orEmpty()
-
-        if (state.runConfiguration !is CustomBuildConfiguration) return null
 
         val pkg = findPackage(artifact, environment)
 

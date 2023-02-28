@@ -22,7 +22,8 @@ class CustomBuildConfiguration(
 ) : CargoCommandConfiguration(project, name, factory) {
     override var command: String = "run" // TODO: it's a hack. not sure if a good idea
 
-    private var crateRootUrl: String? = null
+    var crateRootUrl: String? = null
+        private set
 
     var outDir: String? = null
 
