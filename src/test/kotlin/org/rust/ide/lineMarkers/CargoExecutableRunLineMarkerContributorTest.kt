@@ -30,8 +30,9 @@ class CargoExecutableRunLineMarkerContributorTest : RsLineMarkerProviderTestBase
         fn main() {} // - Run 'Run test-package'
     """)
 
+    // TODO: ugh, the "shortening" is weird, can I get rid of it here?
     fun `test build script`() = doTest("build.rs", """
-        fn main() {}
+        fn main() {} // - Run 'test-package's build...'
     """)
 
     fun `test library`() = doTest("lib.rs", """
