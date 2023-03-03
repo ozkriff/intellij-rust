@@ -157,8 +157,7 @@ abstract class RsExecutableRunner(
         project.showErrorDialog(toolchainError.message)
     }
 
-    // TODO: tmp hack, think later. probably will be reverted after the `doExecute` refactoring
-    protected fun Project.showErrorDialog(@Suppress("UnstableApiUsage") @DialogMessage message: String) {
+    private fun Project.showErrorDialog(@Suppress("UnstableApiUsage") @DialogMessage message: String) {
         Messages.showErrorDialog(this, message, errorMessageTitle)
     }
 
