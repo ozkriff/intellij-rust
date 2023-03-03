@@ -46,7 +46,8 @@ class CustomBuildConfiguration(
 
     override fun readExternal(element: Element) {
         super.readExternal(element)
-        element.readString("outDir")?.let { outDir = it }
+        // TODO: This "" <-> null thing feels like a big hack
+        element.readString("outDir")?.takeIf(String::isNotEmpty).let { outDir = it }
         element.readString("crateRootUrl")?.let { crateRootUrl = it }
     }
 }
