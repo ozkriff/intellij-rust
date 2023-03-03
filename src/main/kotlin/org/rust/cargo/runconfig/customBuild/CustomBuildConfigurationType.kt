@@ -33,14 +33,7 @@ class CustomBuildConfigurationType : ConfigurationTypeBase(
 class CustomBuildConfigurationFactory(type: CustomBuildConfigurationType) : ConfigurationFactory(type) {
     override fun getId(): String = ID
 
-    // TODO: cleanup
     override fun createTemplateConfiguration(project: Project): RunConfiguration {
-        //  val p2 = project as? CargoProject
-        // CargoConstants.ProjectLayout.target
-
-        // val root = LocalFileSystem.getInstance().refreshAndFindFileByIoFile(workingDirectory) ?: return
-        // val targetDir = root.findChild(CargoConstants.ProjectLayout.target) ?: return
-
         return CustomBuildConfiguration(project, id, this)
     }
 

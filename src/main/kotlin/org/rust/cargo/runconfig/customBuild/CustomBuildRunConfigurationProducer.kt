@@ -51,11 +51,6 @@ class CustomBuildRunConfigurationProducer: CargoRunConfigurationProducer() {
         return true
     }
 
-    // TODO: Do I need to re-implement this? or fixed isConfigurationFromContext should be enough?
-    // override fun findExistingConfiguration(context: ConfigurationContext): RunnerAndConfigurationSettings? {
-    //     return super.findExistingConfiguration(context)
-    // }
-
     companion object {
         fun isBuildScriptMainFunction(fn: RsFunction): Boolean {
             val ws = fn.cargoWorkspace ?: return false

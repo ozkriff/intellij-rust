@@ -34,7 +34,6 @@ class CompositeCargoRunConfigurationProducer : CargoRunConfigurationProducer() {
     private val producers: List<CargoRunConfigurationProducer> =
         listOf(
             CargoExecutableRunConfigurationProducer(),
-
             CargoTestRunConfigurationProducer(),
             CargoBenchRunConfigurationProducer()
         )

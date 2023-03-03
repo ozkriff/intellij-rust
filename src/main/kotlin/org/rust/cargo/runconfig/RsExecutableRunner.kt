@@ -93,6 +93,7 @@ abstract class RsExecutableRunner(
                 .firstOrNull { it.origin == PackageOrigin.WORKSPACE }
         }
 
+        // See https://github.com/intellij-rust/intellij-rust/issues/9778
         // val runCargoCommand = state.prepareCommandLine().copy(emulateTerminal = false)
         val runCargoCommand = state.prepareCommandLine() // TODO: tmp hack to fix output
 
