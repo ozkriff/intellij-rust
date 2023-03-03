@@ -25,6 +25,7 @@ import org.rust.cargo.runconfig.buildtool.CargoBuildManager.isBuildToolWindowAva
 import org.rust.cargo.runconfig.buildtool.cargoPatches
 import org.rust.cargo.runconfig.command.CargoCommandConfiguration
 import org.rust.cargo.toolchain.CargoCommandLine
+import org.rust.cargo.toolchain.impl.CargoMetadata
 import org.rust.cargo.toolchain.impl.CompilerArtifactMessage
 import org.rust.cargo.toolchain.tools.Cargo.Companion.getCargoCommonPatch
 import org.rust.cargo.util.CargoArgsParser.Companion.parseArgs
@@ -116,6 +117,7 @@ abstract class RsExecutableRunner(
 
     protected open fun getArtifacts(state: CargoRunStateBase): List<CompilerArtifactMessage> {
         return state.environment.artifacts.orEmpty()
+            .filter { it.target.cleanKind != CargoMetadata.TargetKind.CUSTOM_BUILD }
     }
 
     protected open fun getWorkingDirectory(
