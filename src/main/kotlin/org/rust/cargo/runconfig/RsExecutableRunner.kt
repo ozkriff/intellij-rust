@@ -24,6 +24,7 @@ import org.rust.cargo.runconfig.buildtool.CargoBuildManager.isBuildConfiguration
 import org.rust.cargo.runconfig.buildtool.CargoBuildManager.isBuildToolWindowAvailable
 import org.rust.cargo.runconfig.buildtool.cargoPatches
 import org.rust.cargo.runconfig.command.CargoCommandConfiguration
+import org.rust.cargo.toolchain.CargoCommandLine
 import org.rust.cargo.toolchain.impl.CompilerArtifactMessage
 import org.rust.cargo.toolchain.tools.Cargo.Companion.getCargoCommonPatch
 import org.rust.cargo.util.CargoArgsParser.Companion.parseArgs
@@ -62,15 +63,10 @@ abstract class RsExecutableRunner(
         super.execute(environment)
     }
 
-    // TODO protected open fun getBinaryToRun(): Path {...
-
-    // TODO: Move out first lines that find a correct binary into a separate method in parent
-    //       and do whatever I want with it in different runners
     override fun doExecute(state: RunProfileState, environment: ExecutionEnvironment): RunContentDescriptor? {
         if (state !is CargoRunStateBase) return null
 
-        // TODO: allow customizing these couple of lines so I can put my own binary here, reuse all other lines in parent
-        val artifacts = environment.artifacts.orEmpty()
+        val artifacts = getArtifacts(state)
         val artifact = artifacts.firstOrNull()
         val binaries = artifact?.executables.orEmpty()
 
@@ -90,13 +86,18 @@ abstract class RsExecutableRunner(
             return null
         }
 
-        val pkg = findPackage(artifact, environment)
+        val pkg = artifact?.package_id?.let { id ->
+            environment.project.cargoProjects.allProjects
+                .mapNotNull { it.workspace?.findPackageById(id) }
+                .firstOrNull { it.origin == PackageOrigin.WORKSPACE }
+        }
 
-        val runCargoCommand = state.prepareCommandLine().copy(emulateTerminal = false)
-        val workingDirectory = pkg?.rootDirectory
-            ?.takeIf { runCargoCommand.command == "test" }
-            ?: runCargoCommand.workingDirectory
+        // val runCargoCommand = state.prepareCommandLine().copy(emulateTerminal = false)
+        val runCargoCommand = state.prepareCommandLine() // TODO: tmp hack to fix output
+
+        val workingDirectory = getWorkingDirectory(state, pkg, runCargoCommand)
         val environmentVariables = runCargoCommand.environmentVariables.run { with(envs + pkg?.env.orEmpty()) }
+            .with(getAdditionalEnvVars(state, pkg))
         val (_, executableArguments) = parseArgs(runCargoCommand.command, runCargoCommand.additionalArguments)
         val runExecutable = state.toolchain.createGeneralCommandLine(
             binaries.single().toPath(),
@@ -113,12 +114,25 @@ abstract class RsExecutableRunner(
         return showRunContent(state, environment, runExecutable)
     }
 
-    protected fun findPackage(artifact: CompilerArtifactMessage?, environment: ExecutionEnvironment): CargoWorkspace.Package? {
-        return artifact?.package_id?.let { id ->
-            environment.project.cargoProjects.allProjects
-                .mapNotNull { it.workspace?.findPackageById(id) }
-                .firstOrNull { it.origin == PackageOrigin.WORKSPACE }
-        }
+    protected open fun getArtifacts(state: CargoRunStateBase): List<CompilerArtifactMessage> {
+        return state.environment.artifacts.orEmpty()
+    }
+
+    protected open fun getWorkingDirectory(
+        state: CargoRunStateBase,
+        pkg: CargoWorkspace.Package?,
+        runCargoCommand: CargoCommandLine
+    ): Path {
+        return pkg?.rootDirectory
+            ?.takeIf { runCargoCommand.command == "test" }
+            ?: runCargoCommand.workingDirectory
+    }
+
+    protected open fun getAdditionalEnvVars(
+        state: CargoRunStateBase,
+        pkg: CargoWorkspace.Package?
+    ): Map<String, String> {
+        return mapOf()
     }
 
     protected open fun showRunContent(
