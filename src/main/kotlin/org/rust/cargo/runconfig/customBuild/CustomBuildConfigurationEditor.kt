@@ -5,32 +5,51 @@
 
 package org.rust.cargo.runconfig.customBuild
 
+import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory
 import com.intellij.openapi.options.SettingsEditor
 import com.intellij.openapi.project.Project
-import com.intellij.ui.components.JBTextField
-import com.intellij.ui.layout.panel
+import com.intellij.openapi.ui.TextFieldWithBrowseButton
+import com.intellij.ui.components.CheckBox
+import com.intellij.ui.dsl.builder.RowLayout
+import com.intellij.ui.dsl.builder.panel
+import com.intellij.util.text.nullize
+import org.rust.openapiext.fullWidthCell
+import javax.swing.JCheckBox
 import javax.swing.JComponent
+
+// TODO: move all visible text to translation files & try to improve the text
 
 class CustomBuildConfigurationEditor(val project: Project)
     : SettingsEditor<CustomBuildConfiguration>() {
 
-    private val pathOutDir: JBTextField = JBTextField()
+    private val customOutDir = TextFieldWithBrowseButton().apply {
+        isEnabled = false
+        val fileChooser = FileChooserDescriptorFactory.createSingleFolderDescriptor().apply {
+            title = "Select OUT_DIR"
+            // title = ExecutionBundle.message("select.working.directory.message") // TODO: tr
+        }
+        addBrowseFolderListener(null, null, null, fileChooser)
+    }
+
+    private val isCustomOutDir: JCheckBox = CheckBox("Custom OUT_DIR", false).apply {
+        addChangeListener { customOutDir.isEnabled = isSelected }
+    }
 
     override fun createEditor(): JComponent = panel {
-        // TODO: move all visible text to translation files
-        // TODO: add checkbox that is off by default
-        row("Path to OUT_DIR (TODO make actually work):") {
-            // TODO: add a path text field here (see pathTextField or something similar)
-            pathOutDir()
+        row {
+            layout(RowLayout.LABEL_ALIGNED)
+            cell(isCustomOutDir)
+            fullWidthCell(customOutDir)
         }
     }
 
     override fun resetEditorFrom(configuration: CustomBuildConfiguration) {
-        pathOutDir.text = configuration.outDir ?: ""
+        isCustomOutDir.isSelected = configuration.isCustomOutDir
+        customOutDir.text = configuration.customOutDir ?: ""
     }
 
     override fun applyEditorTo(configuration: CustomBuildConfiguration) {
-        configuration.outDir = pathOutDir.text.ifEmpty { null }
+        configuration.isCustomOutDir = isCustomOutDir.isSelected
+        configuration.customOutDir = customOutDir.text.nullize()
     }
 }
-

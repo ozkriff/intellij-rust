@@ -44,8 +44,8 @@ open class CustomBuildRunner(
 
     private fun getOutDir(state: CargoRunStateBase, pkg: CargoWorkspace.Package?): String? {
         if (state.runConfiguration !is CustomBuildConfiguration) return null
-        return state.runConfiguration.outDir
-            ?: pkg?.outDir?.pathAsPath?.toString()
+        return if (state.runConfiguration.isCustomOutDir) state.runConfiguration.customOutDir.toString()
+            else pkg?.outDir?.pathAsPath?.toString()
             ?: (state.environment.project.basePath + "/target/pseudoOutDir") // TODO: ugh?
     }
 
