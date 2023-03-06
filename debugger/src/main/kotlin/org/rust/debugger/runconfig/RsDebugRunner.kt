@@ -10,6 +10,7 @@ import com.intellij.openapi.project.Project
 import org.rust.cargo.project.settings.toolchain
 import org.rust.cargo.runconfig.BuildResult
 import org.rust.cargo.runconfig.command.CargoCommandConfiguration
+import org.rust.cargo.runconfig.customBuild.CustomBuildConfiguration
 import org.rust.cargo.toolchain.wsl.RsWslToolchain
 
 class RsDebugRunner : RsDebugRunnerBase() {
@@ -17,6 +18,20 @@ class RsDebugRunner : RsDebugRunnerBase() {
     override fun canRun(executorId: String, profile: RunProfile): Boolean =
         super.canRun(executorId, profile) &&
             profile is CargoCommandConfiguration &&
+            profile.project.toolchain !is RsWslToolchain
+
+    override fun checkToolchainSupported(project: Project, host: String): BuildResult.ToolchainError? =
+        RsDebugRunnerUtils.checkToolchainSupported(project, host)
+
+    override fun checkToolchainConfigured(project: Project): Boolean =
+        RsDebugRunnerUtils.checkToolchainConfigured(project)
+}
+
+// TODO: move to other file
+class RsCustomBuildDebugRunner : RsCustomBuildDebugRunnerBase() {
+    override fun canRun(executorId: String, profile: RunProfile): Boolean =
+        super.canRun(executorId, profile) &&
+            profile is CustomBuildConfiguration &&
             profile.project.toolchain !is RsWslToolchain
 
     override fun checkToolchainSupported(project: Project, host: String): BuildResult.ToolchainError? =

@@ -21,11 +21,14 @@ import java.nio.file.Path
 
 private const val ERROR_MESSAGE_TITLE: String = "Unable to run Custom Build Script"
 
-class CustomBuildRunner : RsExecutableRunner(DefaultRunExecutor.EXECUTOR_ID, ERROR_MESSAGE_TITLE) {
+open class CustomBuildRunner(
+    executorId: String = DefaultRunExecutor.EXECUTOR_ID,
+    errorMessageTitle: String = ERROR_MESSAGE_TITLE
+) : RsExecutableRunner(executorId, errorMessageTitle) {
     override fun getRunnerId() = RUNNER_ID
 
     override fun canRun(executorId: String, profile: RunProfile): Boolean {
-        if (executorId != DefaultRunExecutor.EXECUTOR_ID ||
+        if (executorId != this.executorId ||
             profile !is CustomBuildConfiguration ||
             profile.clean() !is CargoCommandConfiguration.CleanConfiguration.Ok) return false
         return profile.isBuildToolWindowAvailable

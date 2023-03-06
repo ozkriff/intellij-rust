@@ -13,8 +13,6 @@ import org.rust.lang.core.psi.RsElementTypes.IDENTIFIER
 import org.rust.lang.core.psi.RsFunction
 import org.rust.lang.core.psi.ext.elementType
 
-// TODO: test project for now is /home/ozkriff/CLionProjects/build-rs-run-debug
-
 class CustomBuildRunLineMarkerContributor : RunLineMarkerContributor() {
     override fun getInfo(element: PsiElement): Info? {
         if (element.elementType != IDENTIFIER) return null

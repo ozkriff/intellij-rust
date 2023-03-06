@@ -11,6 +11,7 @@ import com.intellij.execution.runners.ExecutionEnvironment
 import com.intellij.execution.ui.RunContentDescriptor
 import org.rust.cargo.runconfig.CargoRunStateBase
 import org.rust.cargo.runconfig.RsExecutableRunner
+import org.rust.cargo.runconfig.customBuild.CustomBuildRunner
 import org.rust.debugger.runconfig.RsDebugRunnerUtils.ERROR_MESSAGE_TITLE
 
 abstract class RsDebugRunnerBase : RsExecutableRunner(DefaultDebugExecutor.EXECUTOR_ID, ERROR_MESSAGE_TITLE) {
@@ -24,5 +25,20 @@ abstract class RsDebugRunnerBase : RsExecutableRunner(DefaultDebugExecutor.EXECU
 
     companion object {
         const val RUNNER_ID: String = "RsDebugRunner"
+    }
+}
+
+// TODO: move to other file
+abstract class RsCustomBuildDebugRunnerBase : CustomBuildRunner(DefaultDebugExecutor.EXECUTOR_ID, ERROR_MESSAGE_TITLE) {
+    override fun getRunnerId(): String = RUNNER_ID
+
+    override fun showRunContent(
+        state: CargoRunStateBase,
+        environment: ExecutionEnvironment,
+        runExecutable: GeneralCommandLine
+    ): RunContentDescriptor? = RsDebugRunnerUtils.showRunContent(state, environment, runExecutable)
+
+    companion object {
+        const val RUNNER_ID: String = "CustomBuildDebugRunner"
     }
 }

@@ -7,6 +7,7 @@ package org.rust.clion.debugger.runconfig
 
 import com.intellij.openapi.project.Project
 import org.rust.cargo.runconfig.BuildResult.ToolchainError
+import org.rust.debugger.runconfig.RsCustomBuildDebugRunnerBase
 import org.rust.debugger.runconfig.RsDebugRunnerBase
 
 class RsCLionDebugRunner : RsDebugRunnerBase() {
@@ -21,3 +22,18 @@ class RsCLionDebugRunner : RsDebugRunnerBase() {
         RsCLionDebugRunnerUtils.processInvalidToolchain(project, toolchainError)
     }
 }
+
+// TODO: move out to another file
+// TODO: do the same for IDEA?
+class RsCLionCustomBuildDebugRunner : RsCustomBuildDebugRunnerBase() {
+    override fun checkToolchainSupported(project: Project, host: String): ToolchainError? =
+        RsCLionDebugRunnerUtils.checkToolchainSupported(project, host)
+
+    override fun checkToolchainConfigured(project: Project): Boolean =
+        RsCLionDebugRunnerUtils.checkToolchainConfigured(project)
+
+    override fun processInvalidToolchain(project: Project, toolchainError: ToolchainError) {
+        RsCLionDebugRunnerUtils.processInvalidToolchain(project, toolchainError)
+    }
+}
+//
