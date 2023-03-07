@@ -121,7 +121,7 @@ abstract class RsExecutableRunner(
             .filter { it.target.cleanKind != CargoMetadata.TargetKind.CUSTOM_BUILD }
     }
 
-    protected open fun getWorkingDirectory(
+    fun getWorkingDirectory(
         state: CargoRunStateBase,
         pkg: CargoWorkspace.Package?,
         runCargoCommand: CargoCommandLine

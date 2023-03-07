@@ -13,12 +13,9 @@ import org.rust.cargo.runconfig.CargoRunStateBase
 import org.rust.cargo.runconfig.RsExecutableRunner
 import org.rust.cargo.runconfig.buildtool.CargoBuildManager.isBuildToolWindowAvailable
 import org.rust.cargo.runconfig.command.CargoCommandConfiguration
-import org.rust.cargo.toolchain.CargoCommandLine
 import org.rust.cargo.toolchain.impl.CargoMetadata
 import org.rust.cargo.toolchain.impl.CompilerArtifactMessage
 import org.rust.openapiext.pathAsPath
-import org.rust.stdext.toPath
-import java.nio.file.Path
 
 private val ERROR_MESSAGE_TITLE = RsBundle.message("run.config.rust.custom.build.runner.error.title")
 
@@ -40,6 +37,7 @@ open class CustomBuildRunner(
         pkg: CargoWorkspace.Package?
     ): Map<String, String> {
         val outDir = getOutDir(state, pkg) ?: return mapOf()
+        assert(outDir.isNotEmpty())
         return mapOf("OUT_DIR" to outDir)
     }
 
@@ -48,15 +46,6 @@ open class CustomBuildRunner(
         return if (state.runConfiguration.isCustomOutDir) state.runConfiguration.customOutDir.toString()
             else pkg?.outDir?.pathAsPath?.toString()
             ?: (state.environment.project.basePath + "/target/pseudoOutDir") // TODO: ugh?
-    }
-
-    override fun getWorkingDirectory(
-        state: CargoRunStateBase,
-        pkg: CargoWorkspace.Package?,
-        runCargoCommand: CargoCommandLine
-    ): Path {
-        val outDir = getOutDir(state, pkg)
-        return outDir!!.toPath() // TODO: handle the error better then `!!`
     }
 
     override fun getArtifacts(state: CargoRunStateBase): List<CompilerArtifactMessage> {
