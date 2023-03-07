@@ -13,11 +13,10 @@ import com.intellij.ui.components.CheckBox
 import com.intellij.ui.dsl.builder.RowLayout
 import com.intellij.ui.dsl.builder.panel
 import com.intellij.util.text.nullize
+import org.rust.RsBundle
 import org.rust.openapiext.fullWidthCell
 import javax.swing.JCheckBox
 import javax.swing.JComponent
-
-// TODO: move all visible text to translation files & try to improve the text
 
 class CustomBuildConfigurationEditor(val project: Project)
     : SettingsEditor<CustomBuildConfiguration>() {
@@ -25,13 +24,12 @@ class CustomBuildConfigurationEditor(val project: Project)
     private val customOutDir = TextFieldWithBrowseButton().apply {
         isEnabled = false
         val fileChooser = FileChooserDescriptorFactory.createSingleFolderDescriptor().apply {
-            title = "Select OUT_DIR"
-            // title = ExecutionBundle.message("select.working.directory.message") // TODO: tr
+            title = RsBundle.message("run.config.rust.custom.build.custom.out.dir.label")
         }
         addBrowseFolderListener(null, null, null, fileChooser)
     }
 
-    private val isCustomOutDir: JCheckBox = CheckBox("Custom OUT_DIR", false).apply {
+    private val isCustomOutDir: JCheckBox = CheckBox(RsBundle.message("run.config.rust.custom.build.custom.out.dir.label"), false).apply {
         addChangeListener { customOutDir.isEnabled = isSelected }
     }
 

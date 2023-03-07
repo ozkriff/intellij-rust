@@ -7,6 +7,7 @@ package org.rust.cargo.runconfig.customBuild
 
 import com.intellij.execution.configurations.RunProfile
 import com.intellij.execution.executors.DefaultRunExecutor
+import org.rust.RsBundle
 import org.rust.cargo.project.workspace.CargoWorkspace
 import org.rust.cargo.runconfig.CargoRunStateBase
 import org.rust.cargo.runconfig.RsExecutableRunner
@@ -19,7 +20,7 @@ import org.rust.openapiext.pathAsPath
 import org.rust.stdext.toPath
 import java.nio.file.Path
 
-private const val ERROR_MESSAGE_TITLE: String = "Unable to run Custom Build Script"
+private val ERROR_MESSAGE_TITLE = RsBundle.message("run.config.rust.custom.build.runner.error.title")
 
 open class CustomBuildRunner(
     executorId: String = DefaultRunExecutor.EXECUTOR_ID,

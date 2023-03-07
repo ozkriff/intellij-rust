@@ -11,6 +11,7 @@ import com.intellij.openapi.options.SettingsEditor
 import com.intellij.openapi.project.Project
 import com.intellij.util.text.nullize
 import org.jdom.Element
+import org.rust.RsBundle
 import org.rust.cargo.project.workspace.CargoWorkspace
 import org.rust.cargo.runconfig.command.CargoCommandConfiguration
 import org.rust.cargo.runconfig.readBool
@@ -39,7 +40,7 @@ class CustomBuildConfiguration(
 
     fun setTarget(target: CargoWorkspace.Target) {
         crateRootUrl = target.crateRoot?.url
-        name = target.pkg.name + "'s build.rs" // TODO: translation?
+        name = RsBundle.message("run.config.rust.custom.build.target.name", target.pkg.name)
     }
 
     override fun writeExternal(element: Element) {
