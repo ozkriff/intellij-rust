@@ -32,14 +32,11 @@ class RunConfigurationTest : RunConfigurationTestBase() {
         check("Hello, world!" in result.stdout)
     }
 
-    // TODO: add more checks
-    //       - caret in main.rs shouldn't create a CustomBuildRunConfiguration
-    //       - ?
     fun `test build script configuration run basic`() {
         val testProject = fileTree {
             toml("Cargo.toml", """
                 [package]
-                name = "hello-build-rs"
+                name = "hello"
                 version = "0.1.0"
             """)
             rust("build.rs", """
@@ -97,6 +94,27 @@ class RunConfigurationTest : RunConfigurationTestBase() {
         myFixture.configureFromTempProjectFile(testProject.fileWithCaret)
         val result = executeAndGetOutput(createCustomBuildRunConfigurationFromContext())
         check("Hello from b/build.rs" in result.stdout)
+    }
+
+    fun `test build script configuration run in library package`() {
+        val testProject = fileTree {
+            toml("Cargo.toml", """
+                [package]
+                name = "hello"
+                version = "0.1.0"
+            """)
+            rust("build.rs", """
+                fn main() { println!("Hello from build.rs"); } /*caret*/
+            """)
+            dir("src") {
+                rust("lib.rs", """
+                    pub fn foo() {}
+                """)
+            }
+        }.create()
+        myFixture.configureFromTempProjectFile(testProject.fileWithCaret)
+        val result = executeAndGetOutput(createCustomBuildRunConfigurationFromContext())
+        check("Hello from build.rs" in result.stdout)
     }
 
     fun `test single test configuration 1`() {
