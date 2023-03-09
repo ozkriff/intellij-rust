@@ -93,11 +93,8 @@ abstract class RsExecutableRunner(
                 .firstOrNull { it.origin == PackageOrigin.WORKSPACE }
         }
 
-        // See https://github.com/intellij-rust/intellij-rust/issues/9778
-        // val runCargoCommand = state.prepareCommandLine().copy(emulateTerminal = false)
-        val runCargoCommand = state.prepareCommandLine() // TODO: tmp hack to fix output
-
-        val workingDirectory = getWorkingDirectory(state, pkg, runCargoCommand)
+        val runCargoCommand = modifyFinalCommand(state)
+        val workingDirectory = getWorkingDirectory(pkg, runCargoCommand)
         val environmentVariables = runCargoCommand.environmentVariables.run { with(envs + pkg?.env.orEmpty()) }
             .with(getAdditionalEnvVars(state, pkg))
         val (_, executableArguments) = parseArgs(runCargoCommand.command, runCargoCommand.additionalArguments)
@@ -116,13 +113,15 @@ abstract class RsExecutableRunner(
         return showRunContent(state, environment, runExecutable)
     }
 
+    protected open fun modifyFinalCommand(state: CargoRunStateBase) =
+        state.prepareCommandLine().copy(emulateTerminal = false)
+
     protected open fun getArtifacts(state: CargoRunStateBase): List<CompilerArtifactMessage> {
         return state.environment.artifacts.orEmpty()
             .filter { it.target.cleanKind != CargoMetadata.TargetKind.CUSTOM_BUILD }
     }
 
-    fun getWorkingDirectory(
-        state: CargoRunStateBase,
+    private fun getWorkingDirectory(
         pkg: CargoWorkspace.Package?,
         runCargoCommand: CargoCommandLine
     ): Path {

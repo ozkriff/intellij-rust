@@ -13,6 +13,7 @@ import org.rust.cargo.runconfig.CargoRunStateBase
 import org.rust.cargo.runconfig.RsExecutableRunner
 import org.rust.cargo.runconfig.buildtool.CargoBuildManager.isBuildToolWindowAvailable
 import org.rust.cargo.runconfig.command.CargoCommandConfiguration
+import org.rust.cargo.toolchain.CargoCommandLine
 import org.rust.cargo.toolchain.impl.CargoMetadata
 import org.rust.cargo.toolchain.impl.CompilerArtifactMessage
 import org.rust.openapiext.pathAsPath
@@ -57,6 +58,11 @@ open class CustomBuildRunner(
             message.target.cleanKind == CargoMetadata.TargetKind.CUSTOM_BUILD
                 && "file://" + message.target.src_path == crateRootUrl // TODO: better way to get URL?
         }
+    }
+
+    // TODO: shouldn't be needed after https://github.com/intellij-rust/intellij-rust/issues/9778 is fixed
+    override fun modifyFinalCommand(state: CargoRunStateBase): CargoCommandLine {
+        return super.modifyFinalCommand(state).copy(emulateTerminal = true)
     }
 
     companion object {
