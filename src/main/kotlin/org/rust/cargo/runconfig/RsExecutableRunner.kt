@@ -121,15 +121,6 @@ abstract class RsExecutableRunner(
             .filter { it.target.cleanKind != CargoMetadata.TargetKind.CUSTOM_BUILD }
     }
 
-    private fun getWorkingDirectory(
-        pkg: CargoWorkspace.Package?,
-        runCargoCommand: CargoCommandLine
-    ): Path {
-        return pkg?.rootDirectory
-            ?.takeIf { runCargoCommand.command == "test" }
-            ?: runCargoCommand.workingDirectory
-    }
-
     protected open fun getAdditionalEnvVars(
         state: CargoRunStateBase,
         pkg: CargoWorkspace.Package?
@@ -155,6 +146,15 @@ abstract class RsExecutableRunner(
 
     open fun processInvalidToolchain(project: Project, toolchainError: BuildResult.ToolchainError) {
         project.showErrorDialog(toolchainError.message)
+    }
+
+    private fun getWorkingDirectory(
+        pkg: CargoWorkspace.Package?,
+        runCargoCommand: CargoCommandLine
+    ): Path {
+        return pkg?.rootDirectory
+            ?.takeIf { runCargoCommand.command == "test" }
+            ?: runCargoCommand.workingDirectory
     }
 
     private fun Project.showErrorDialog(@Suppress("UnstableApiUsage") @DialogMessage message: String) {
