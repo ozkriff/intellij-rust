@@ -23,6 +23,7 @@ class RsProfilerRunnerLegacy : RsAsyncRunner(ProfilerExecutor.EXECUTOR_ID, ERROR
 
     override fun canRun(executorId: String, profile: RunProfile): Boolean {
         if (profile !is CargoCommandConfiguration) return false
+        if (profile is CustomBuildConfiguration) return false
         return (RsDTraceConfigurationExtension.isEnabledFor() || RsPerfConfigurationExtension.isEnabledFor(profile)) &&
             super.canRun(executorId, profile)
     }
