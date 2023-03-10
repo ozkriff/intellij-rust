@@ -17,6 +17,7 @@ import org.rust.cargo.toolchain.CargoCommandLine
 import org.rust.cargo.toolchain.impl.CargoMetadata
 import org.rust.cargo.toolchain.impl.CompilerArtifactMessage
 import org.rust.openapiext.pathAsPath
+import org.rust.stdext.toPath
 import java.nio.file.Path
 
 private val ERROR_MESSAGE_TITLE = RsBundle.message("run.config.rust.custom.build.runner.error.title")
