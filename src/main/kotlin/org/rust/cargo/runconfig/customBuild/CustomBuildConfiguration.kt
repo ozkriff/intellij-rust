@@ -13,11 +13,9 @@ import com.intellij.util.text.nullize
 import org.jdom.Element
 import org.rust.RsBundle
 import org.rust.cargo.project.workspace.CargoWorkspace
+import org.rust.cargo.runconfig.*
 import org.rust.cargo.runconfig.command.CargoCommandConfiguration
-import org.rust.cargo.runconfig.readBool
-import org.rust.cargo.runconfig.readString
-import org.rust.cargo.runconfig.writeBool
-import org.rust.cargo.runconfig.writeString
+import java.nio.file.Path
 
 class CustomBuildConfiguration(
     project: Project,
@@ -30,7 +28,7 @@ class CustomBuildConfiguration(
         private set
 
     var isCustomOutDir: Boolean = false
-    var customOutDir: String? = null // TODO: String -> Path?
+    var customOutDir: Path? = null
 
     override fun getConfigurationEditor(): SettingsEditor<out RunConfiguration> =
         CustomBuildConfigurationEditor(project)
@@ -46,14 +44,14 @@ class CustomBuildConfiguration(
     override fun writeExternal(element: Element) {
         super.writeExternal(element)
         element.writeBool("isCustomOutDir", isCustomOutDir)
-        element.writeString("customOutDir", customOutDir ?: "")
+        element.writePath("customOutDir", customOutDir)
         element.writeString("crateRootUrl", crateRootUrl ?: "")
     }
 
     override fun readExternal(element: Element) {
         super.readExternal(element)
         element.readBool("isCustomOutDir")?.let { isCustomOutDir = it }
-        element.readString("customOutDir")?.let { customOutDir = it.nullize() }
+        element.readPath("customOutDir")?.let { customOutDir = it }
         element.readString("crateRootUrl")?.let { crateRootUrl = it.nullize() }
     }
 }

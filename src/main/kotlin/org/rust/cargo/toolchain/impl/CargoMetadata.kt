@@ -434,6 +434,7 @@ object CargoMetadata {
 
         val semver = SemVer.parseFromText(version)
 
+        // NOTE
         // https://doc.rust-lang.org/cargo/reference/environment-variables.html#environment-variables-cargo-sets-for-crates
         val env: Map<String, String> = envFromBuildscript + mapOf(
             "CARGO_MANIFEST_DIR" to rootPath,

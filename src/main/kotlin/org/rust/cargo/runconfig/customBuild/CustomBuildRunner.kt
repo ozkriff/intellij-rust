@@ -17,6 +17,7 @@ import org.rust.cargo.toolchain.CargoCommandLine
 import org.rust.cargo.toolchain.impl.CargoMetadata
 import org.rust.cargo.toolchain.impl.CompilerArtifactMessage
 import org.rust.openapiext.pathAsPath
+import java.nio.file.Path
 
 private val ERROR_MESSAGE_TITLE = RsBundle.message("run.config.rust.custom.build.runner.error.title")
 
@@ -33,20 +34,22 @@ open class CustomBuildRunner(
         return profile.isBuildToolWindowAvailable
     }
 
+    // TODO https://doc.rust-lang.org/cargo/reference/environment-variables.html#environment-variables-cargo-sets-for-build-scripts
     override fun getAdditionalEnvVars(
         state: CargoRunStateBase,
         pkg: CargoWorkspace.Package?
     ): Map<String, String> {
         val outDir = getOutDir(state, pkg) ?: return mapOf()
-        assert(outDir.isNotEmpty())
-        return mapOf("OUT_DIR" to outDir)
+        return mapOf("OUT_DIR" to outDir.toString())
     }
 
-    private fun getOutDir(state: CargoRunStateBase, pkg: CargoWorkspace.Package?): String? {
-        if (state.runConfiguration !is CustomBuildConfiguration) return null
-        return if (state.runConfiguration.isCustomOutDir) state.runConfiguration.customOutDir.toString()
-            else pkg?.outDir?.pathAsPath?.toString()
-            ?: (state.environment.project.basePath + "/target/pseudoOutDir") // TODO: ugh?
+    private fun getOutDir(state: CargoRunStateBase, pkg: CargoWorkspace.Package?): Path? {
+        val configuration = state.runConfiguration
+        if (configuration !is CustomBuildConfiguration) return null
+        return when {
+            configuration.isCustomOutDir -> configuration.customOutDir
+            else -> pkg?.outDir?.pathAsPath
+        }
     }
 
     override fun getArtifacts(state: CargoRunStateBase): List<CompilerArtifactMessage> {

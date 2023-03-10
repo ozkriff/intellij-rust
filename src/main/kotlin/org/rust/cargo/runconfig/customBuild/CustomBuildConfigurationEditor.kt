@@ -12,9 +12,9 @@ import com.intellij.openapi.ui.TextFieldWithBrowseButton
 import com.intellij.ui.components.CheckBox
 import com.intellij.ui.dsl.builder.RowLayout
 import com.intellij.ui.dsl.builder.panel
-import com.intellij.util.text.nullize
 import org.rust.RsBundle
 import org.rust.openapiext.fullWidthCell
+import org.rust.stdext.toPath
 import javax.swing.JCheckBox
 import javax.swing.JComponent
 
@@ -43,11 +43,11 @@ class CustomBuildConfigurationEditor(val project: Project)
 
     override fun resetEditorFrom(configuration: CustomBuildConfiguration) {
         isCustomOutDir.isSelected = configuration.isCustomOutDir
-        customOutDir.text = configuration.customOutDir ?: ""
+        customOutDir.text = configuration.customOutDir.toString()
     }
 
     override fun applyEditorTo(configuration: CustomBuildConfiguration) {
         configuration.isCustomOutDir = isCustomOutDir.isSelected
-        configuration.customOutDir = customOutDir.text.nullize()
+        configuration.customOutDir = customOutDir.text.toPath()
     }
 }
