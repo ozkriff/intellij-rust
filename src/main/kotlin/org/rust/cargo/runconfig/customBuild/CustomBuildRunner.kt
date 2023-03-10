@@ -56,10 +56,10 @@ open class CustomBuildRunner(
         if (state.runConfiguration !is CustomBuildConfiguration) {
             return listOf()
         }
-        val crateRootUrl = state.runConfiguration.crateRootUrl
-        return state.environment.artifacts.orEmpty().filter { message ->
-            message.target.cleanKind == CargoMetadata.TargetKind.CUSTOM_BUILD
-                && "file://" + message.target.src_path == crateRootUrl // TODO: better way to get URL?
+        val crateRoot = state.runConfiguration.crateRoot
+        return state.environment.artifacts.orEmpty().filter {
+            it.target.cleanKind == CargoMetadata.TargetKind.CUSTOM_BUILD
+                && it.target.src_path.toPath() == crateRoot
         }
     }
 
