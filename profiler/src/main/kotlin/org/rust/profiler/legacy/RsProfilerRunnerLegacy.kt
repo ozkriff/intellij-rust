@@ -9,6 +9,7 @@ import com.intellij.execution.configurations.RunProfile
 import com.intellij.profiler.clion.ProfilerExecutor
 import org.rust.cargo.runconfig.buildtool.CargoBuildManager.isBuildToolWindowAvailable
 import org.rust.cargo.runconfig.command.CargoCommandConfiguration
+import org.rust.cargo.runconfig.customBuild.CustomBuildConfiguration
 import org.rust.cargo.runconfig.legacy.RsAsyncRunner
 import org.rust.profiler.dtrace.RsDTraceConfigurationExtension
 import org.rust.profiler.perf.RsPerfConfigurationExtension
