@@ -35,13 +35,18 @@ open class CustomBuildRunner(
         return profile.isBuildToolWindowAvailable
     }
 
-    // TODO https://doc.rust-lang.org/cargo/reference/environment-variables.html#environment-variables-cargo-sets-for-build-scripts
+    // See https://doc.rust-lang.org/cargo/reference/environment-variables.html
     override fun getAdditionalEnvVars(
         state: CargoRunStateBase,
         pkg: CargoWorkspace.Package?
     ): Map<String, String> {
-        val outDir = getOutDir(state, pkg) ?: return mapOf()
-        return mapOf("OUT_DIR" to outDir.toString())
+        val outDir = getOutDir(state, pkg).toString()
+        val host = "x86_64-unknown-linux-gnu" // TODO: `state.rustVersion().host`, `cargoConfig.buildTarget` or something like that
+        return mapOf(
+            "OUT_DIR" to outDir,
+            "HOST" to host,
+            "TARGET" to host, // TODO: replace with an actual target?
+        )
     }
 
     private fun getOutDir(state: CargoRunStateBase, pkg: CargoWorkspace.Package?): Path? {
