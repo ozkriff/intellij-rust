@@ -27,8 +27,10 @@ class RsDebugRunner : RsDebugRunnerBase() {
         RsDebugRunnerUtils.checkToolchainConfigured(project)
 }
 
+// TODO: add `emulateTerminal=true` with TODO note somewhere here?
 // TODO: move to other file
-class RsCustomBuildDebugRunner : RsCustomBuildDebugRunnerBase() {
+// TODO: similar legacy runner
+class CustomBuildDebugRunner : CustomBuildDebugRunnerBase() {
     override fun canRun(executorId: String, profile: RunProfile): Boolean =
         super.canRun(executorId, profile) &&
             profile is CustomBuildConfiguration &&

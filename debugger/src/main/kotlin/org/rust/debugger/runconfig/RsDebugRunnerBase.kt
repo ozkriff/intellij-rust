@@ -29,7 +29,7 @@ abstract class RsDebugRunnerBase : RsExecutableRunner(DefaultDebugExecutor.EXECU
 }
 
 // TODO: move to other file
-abstract class RsCustomBuildDebugRunnerBase : CustomBuildRunner(DefaultDebugExecutor.EXECUTOR_ID, ERROR_MESSAGE_TITLE) {
+abstract class CustomBuildDebugRunnerBase : CustomBuildRunner(DefaultDebugExecutor.EXECUTOR_ID, ERROR_MESSAGE_TITLE) {
     override fun getRunnerId(): String = RUNNER_ID
 
     override fun showRunContent(
