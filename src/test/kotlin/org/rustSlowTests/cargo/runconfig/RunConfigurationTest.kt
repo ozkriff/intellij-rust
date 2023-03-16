@@ -117,31 +117,6 @@ class RunConfigurationTest : RunConfigurationTestBase() {
         check("Hello from build.rs" in result.stdout)
     }
 
-    // TODO: check that OUT_DIR and HOST have adequate values
-    fun `test build script configuration env vars (WIP)`() {
-        val testProject = fileTree {
-            toml("Cargo.toml", """
-                [package]
-                name = "hello"
-                version = "0.1.0"
-            """)
-            rust("build.rs", """
-                /*caret*/ fn main() {
-                    println!("OUT_DIR={}", std::env::var("OUT_DIR").unwrap());
-                    println!("HOST={}", std::env::var("HOST").unwrap());
-                }
-            """)
-            dir("src") {
-                rust("main.rs", "fn main() {}")
-            }
-        }.create()
-        myFixture.configureFromTempProjectFile(testProject.fileWithCaret)
-        val result = executeAndGetOutput(createCustomBuildRunConfigurationFromContext())
-
-        check("OUT_DIR=null" in result.stdout) // TODO: why is it "null" in test runner?
-        check("HOST=x86_64-unknown-linux-gnu" in result.stdout) // TODO: this is just a stab atm
-    }
-
     fun `test single test configuration 1`() {
         val testProject = fileTree {
             toml("Cargo.toml", """

@@ -39,13 +39,13 @@ open class CustomBuildRunner(
     override fun getAdditionalEnvVars(
         state: CargoRunStateBase,
         pkg: CargoWorkspace.Package?
-    ): Map<String, String> {
-        val outDir = getOutDir(state, pkg).toString()
-        val host = "x86_64-unknown-linux-gnu" // TODO: `state.rustVersion().host`, `cargoConfig.buildTarget` or something like that
+    ): Map<String, String>? {
+        val outDir = getOutDir(state, pkg) // TODO: add `?: return null` when the test runner is fixed
+        val host = state.cargoProject?.rustcInfo?.version?.host ?: return null
         return mapOf(
-            "OUT_DIR" to outDir,
+            "OUT_DIR" to outDir.toString(),
             "HOST" to host,
-            "TARGET" to host, // TODO: replace with an actual target?
+            "TARGET" to host, // TODO: replace with an actual target
         )
     }
 

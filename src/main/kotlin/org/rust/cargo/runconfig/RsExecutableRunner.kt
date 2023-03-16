@@ -80,7 +80,6 @@ abstract class RsExecutableRunner(
             else -> null
         }
 
-        // TODO: need to do some filtering for the debug builds to work here, right?
         val errorMessage = checkErrors(artifacts, "artifact") ?: checkErrors(binaries, "binary")
         if (errorMessage != null) {
             environment.project.showErrorDialog(errorMessage)
@@ -95,8 +94,10 @@ abstract class RsExecutableRunner(
 
         val runCargoCommand = modifyFinalCommand(state)
         val workingDirectory = getWorkingDirectory(pkg, runCargoCommand)
-        val environmentVariables = runCargoCommand.environmentVariables.run { with(envs + pkg?.env.orEmpty()) }
-            .with(getAdditionalEnvVars(state, pkg))
+        val additionalEnvVars = getAdditionalEnvVars(state, pkg) ?: return null
+        val environmentVariables = runCargoCommand.environmentVariables.run {
+            with(envs + pkg?.env.orEmpty() + additionalEnvVars)
+        }
         val (_, executableArguments) = parseArgs(runCargoCommand.command, runCargoCommand.additionalArguments)
         val runExecutable = state.toolchain.createGeneralCommandLine(
             binaries.single().toPath(),
@@ -124,7 +125,7 @@ abstract class RsExecutableRunner(
     protected open fun getAdditionalEnvVars(
         state: CargoRunStateBase,
         pkg: CargoWorkspace.Package?
-    ): Map<String, String> {
+    ): Map<String, String>? {
         return mapOf()
     }
 

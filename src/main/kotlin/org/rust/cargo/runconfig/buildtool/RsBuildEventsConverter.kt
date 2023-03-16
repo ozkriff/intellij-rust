@@ -105,7 +105,6 @@ class RsBuildEventsConverter(private val context: CargoBuildContextBase) : Build
             }
             CargoMetadata.TargetKind.TEST -> true
             CargoMetadata.TargetKind.LIB -> rustcArtifact.profile.test
-            // TODO: this might cause issues in some other places that weren't ready for more binaries
             CargoMetadata.TargetKind.CUSTOM_BUILD -> true
             else -> false
         }
